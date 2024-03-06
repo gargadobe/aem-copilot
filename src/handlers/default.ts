@@ -17,5 +17,11 @@ export async function defaultHandler(request: vscode.ChatRequest, access: any, s
         stream.markdown(catFragment);
     }
 
-    return { metadata: { command: '' } };
+    const resultObj  = {
+        metadata: {
+            command: commands.INFO
+        }
+    }
+
+    return resultObj;
 }

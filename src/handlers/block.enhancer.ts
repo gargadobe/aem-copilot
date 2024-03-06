@@ -21,5 +21,11 @@ export async function enhanceBlock(request: vscode.ChatRequest, access: any, str
         title: vscode.l10n.t(AEM_COMMAND_ID)
     });
 
-    return { metadata: { command: commands.ENHANCE } };
+    const resultObj  = {
+        metadata: {
+            command: commands.ENHANCE
+        }
+    }
+
+    return resultObj;
 }
