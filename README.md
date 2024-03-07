@@ -20,3 +20,9 @@ This shows
 ## Common issue
 
 Clear cache- rm -rf  ~/Library/Application\ Support/Code\ -\ Insiders/Cache*
+
+## References
+
+https://code.visualstudio.com/api/extension-guides/chat
+
+

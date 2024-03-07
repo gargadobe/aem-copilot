@@ -68,28 +68,6 @@ export function activate(context: vscode.ExtensionContext) {
         }
     };
 
-    //#TODO Need to check how i can use chat variables
-    vscode.chat.registerChatVariableResolver('aem_context', 'Describes the state of mind and version of the cat', {
-        resolve: (name, context, token) => {
-            if (name == 'aem_context') {
-                const mood = Math.random() > 0.5 ? 'happy' : 'grumpy';
-                return [
-                    {
-                        level: vscode.ChatVariableLevel.Short, 
-                        value: 'version 1.3 ' + mood 
-                    },
-                    {
-                        level: vscode.ChatVariableLevel.Medium, 
-                        value: 'I am a playful cat, version 1.3, and I am ' + mood 
-                    },
-                    {
-                        level: vscode.ChatVariableLevel.Full, 
-                        value: 'I am a playful cat, version 1.3, this version prefer to explain everything using mouse and tail metaphores. I am ' + mood 
-                    }
-                ]
-            }
-        }
-    });
 
     context.subscriptions.push(
         aem,
