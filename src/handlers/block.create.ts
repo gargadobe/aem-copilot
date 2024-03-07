@@ -1,26 +1,29 @@
 import * as vscode from 'vscode';
 import * as prompts from '../prompts/create.block'
 import { AEM_COMMANDS as commands } from '../aem.commands';
-import { PROCESS_COPILOT_CREATE_CMD } from '../constants';
+import { LANGUAGE_MODEL_ID, PROCESS_COPILOT_CREATE_CMD } from '../constants';
 
-export async function createCmdHandler(request: vscode.ChatRequest, access: any, stream: vscode.ChatResponseStream, token: vscode.CancellationToken) {
+export async function createCmdHandler(request: vscode.ChatRequest,stream: vscode.ChatResponseStream, token: vscode.CancellationToken) {
     const userMesage = request.prompt;
     const messages = [
-        new vscode.LanguageModelSystemMessage(prompts.CREATE_SYSTEM_MESSAGE),
-        new vscode.LanguageModelUserMessage(userMesage),
+        new vscode.LanguageModelChatSystemMessage(prompts.CREATE_SYSTEM_MESSAGE),
+        new vscode.LanguageModelChatUserMessage(userMesage),
     ];
-    const chatRequest = access.makeChatRequest(messages, {}, token);
+
+    const progressStr = vscode.l10n.t("Creating AEM block...");
+    stream.progress(progressStr);
+    const chatResponse = await vscode.lm.sendChatRequest(LANGUAGE_MODEL_ID, messages, {}, token);
     let result = "";
     let resultJson = "";
     let flag = false;
-    for await (const fragment of chatRequest.stream) {
-        if (flag || fragment.includes("->")) {
-            resultJson += fragment;
-            flag = true;
-        } else {
-            stream.markdown(fragment);
-            result += fragment;
-        }
+    for await (const fragment of chatResponse.stream) {
+      if (flag || fragment.includes("->")) {
+        resultJson += fragment;
+        flag = true;
+      } else {
+        stream.markdown(fragment);
+        result += fragment;
+      }
     }
     console.log(result);
     console.log(resultJson);

@@ -9,7 +9,7 @@
     },
     "version": "0.1.0",
     "engines": {
-        "vscode": "^1.86.0"
+        "vscode": "^1.88.0"
     },
     "extensionDependencies": [
         "github.copilot-chat"
@@ -30,6 +30,33 @@
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./"
+    },
+     "contributes": {
+        "chatParticipants": [
+            {
+                "name": "aem",
+                "description": "AEM Assistant to help with blocks developement",
+                "commands": [
+                    {
+                        "name": "create",
+                        "description": "Given a block name, create corresponding files"
+                    },
+                    {
+                        "name": "enhance",
+                        "description": "Enhance an existing AEM EDS block"
+                    }, {
+                        "name": "info",
+                        "description": "Information About AEM EDS blocks"
+                    }
+                ]
+            }
+        ],
+        "commands": [
+            {
+                "command": "cat.namesInEditor",
+                "title": "Use Cat Names in Editor"
+            }
+        ]
     },
     "devDependencies": {
         "@types/node": "^20.5.9",

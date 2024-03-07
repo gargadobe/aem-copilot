@@ -1,20 +1,19 @@
 import * as vscode from "vscode";
 import * as prompts from "../prompts/eds.info.prompt";
 import { AEM_COMMANDS as commands } from "../aem.commands";
-import { AEM_COMMAND_ID } from "../constants";
+import { AEM_COMMAND_ID, LANGUAGE_MODEL_ID } from "../constants";
 
 export async function infoCmdHandler(
   request: vscode.ChatRequest,
-  access: any,
   stream: vscode.ChatResponseStream,
   token: vscode.CancellationToken
 ) {
   const userMesage = request.prompt;
   const messages = [
-    new vscode.LanguageModelSystemMessage(prompts.EDS_INFO_PROMPT_MSG),
-    new vscode.LanguageModelUserMessage(userMesage),
+    new vscode.LanguageModelChatSystemMessage(prompts.EDS_INFO_PROMPT_MSG),
+    new vscode.LanguageModelChatUserMessage(userMesage),
   ];
-  const chatRequest = access.makeChatRequest(messages, {}, token);
+  const chatResponse = await vscode.lm.sendChatRequest(LANGUAGE_MODEL_ID, messages, {}, token);
   let result = "";
   const editor = vscode.window.activeTextEditor;
   if (editor) {
@@ -39,7 +38,7 @@ export async function infoCmdHandler(
     stream.reference(location);
   }
 
-  for await (const fragment of chatRequest.stream) {
+  for await (const fragment of chatResponse.stream) {
     stream.markdown(fragment);
     result += fragment;
   }
