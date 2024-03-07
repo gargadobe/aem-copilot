@@ -4,8 +4,8 @@ import  { createCmdHandler } from './handlers/block.create';
 import { infoCmdHandler } from './handlers/block.overview';
 import { enhanceBlock as enhanceCmdHandler } from './handlers/block.enhancer';
 import { defaultHandler } from './handlers/default';
-import { AEM_COMMAND_ID, LANGUAGE_MODEL_ID, PROCESS_COPILOT_COMMAND_ID } from './constants';
-
+import { AEM_COMMAND_ID, LANGUAGE_MODEL_ID, PROCESS_COPILOT_CREATE_CMD } from './constants';
+import { createFolderAndFiles } from './utils';
 
 interface IAemChatResult extends vscode.ChatResult {
     metadata: {
@@ -13,13 +13,10 @@ interface IAemChatResult extends vscode.ChatResult {
     }
 }
 
-function displayfunction() {
-    console.log("hello");
-}
 
 export function activate(context: vscode.ExtensionContext) {
 
-    // let copilotResult: any; 
+    let copilotResult: any
 
     // Define a AEM chat handler. 
     const handler: vscode.ChatRequestHandler = async (request: vscode.ChatRequest, context2: vscode.ChatContext, stream: vscode.ChatResponseStream, token: vscode.CancellationToken): Promise<IAemChatResult> => {
@@ -28,20 +25,19 @@ export function activate(context: vscode.ExtensionContext) {
         // The GitHub Copilot Chat extension implements this provider.
 
         const access = await vscode.lm.requestLanguageModelAccess(LANGUAGE_MODEL_ID);
-        let copilotResult2: any;
+        let cmdResult: any;
         if (request.command == commands.INFO) {
-            copilotResult2 =  await infoCmdHandler(request, access, stream, token);
+            cmdResult =  await infoCmdHandler(request, access, stream, token);
         } else if (request.command == commands.CREATE ) {
-            copilotResult2 =  await createCmdHandler(request, access, stream, token);
+            cmdResult =  await createCmdHandler(request, access, stream, token);
         } else if (request.command == commands.ENHANCE) {
-            copilotResult2 =  await enhanceCmdHandler(request, access, stream, token);
+            cmdResult =  await enhanceCmdHandler(request, access, stream, token);
         } else {
-            copilotResult2 =  await defaultHandler(request, access, stream, token);
+            cmdResult =  await defaultHandler(request, access, stream, token);
         }
-
+        copilotResult = cmdResult;
         
-        const cmd = request.command || commands.INFO;
-        return { metadata: { command: cmd } };
+        return cmdResult.metadata;
     };
 
     // Chat participants appear as top-level options in the chat input
@@ -97,8 +93,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         aem,
-        vscode.commands.registerCommand(AEM_COMMAND_ID, async () => {
-            vscode.window.showInformationMessage('AEM!');
+        vscode.commands.registerCommand(PROCESS_COPILOT_CREATE_CMD, async () => {
+            const files = copilotResult.files
+            await createFolderAndFiles(files);
         }),
     );
 }

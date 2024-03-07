@@ -20,5 +20,13 @@ export async function infoCmdHandler(request: vscode.ChatRequest, access: any, s
         command: AEM_COMMAND_ID,
         title: vscode.l10n.t(AEM_COMMAND_ID)
     });
-    return { metadata: { command: commands.INFO } };
+
+
+    const resultObj  = {
+        metadata: {
+            command: commands.INFO
+        }
+    }
+
+    return resultObj;
 }
