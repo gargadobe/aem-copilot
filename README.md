@@ -1,12 +1,12 @@
-# Chat Example
+# Copilot Chat
 
-This sample shows
+This shows
 
-- How to contribute a chat participant.
-- How to use the chatRequestAccess API to request access to the chat.
+- Get Info about AEM blocks.
+- Create AEM block.
 - How to respond with follow-ups.
 
-![demo](./demo.png)
+![demo](./demo2.png)
 
 ## Running the Sample
 
