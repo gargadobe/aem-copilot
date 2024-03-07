@@ -34,7 +34,6 @@ export async function infoCmdHandler(
       // If there is a selection, use it to create the location
       location = new vscode.Location(uri, selection);
     }
-
     stream.reference(location);
   }
 
