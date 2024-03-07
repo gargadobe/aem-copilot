@@ -13,6 +13,8 @@ export async function infoCmdHandler(
     new vscode.LanguageModelChatSystemMessage(prompts.EDS_INFO_PROMPT_MSG),
     new vscode.LanguageModelChatUserMessage(userMesage),
   ];
+  const progressStr = vscode.l10n.t("Provide AEM block Info...");
+  stream.progress(progressStr);
   const chatResponse = await vscode.lm.sendChatRequest(LANGUAGE_MODEL_ID, messages, {}, token);
   let result = "";
   const editor = vscode.window.activeTextEditor;

@@ -9,6 +9,8 @@ export async function enhanceBlock(request: vscode.ChatRequest,stream: vscode.Ch
         new vscode.LanguageModelChatSystemMessage(prompts.CREATE_SYSTEM_MESSAGE),
         new vscode.LanguageModelChatUserMessage(userMesage),
     ];
+    const progressStr = vscode.l10n.t("Enhancing AEM block...");
+    stream.progress(progressStr);
     const chatResponse = await vscode.lm.sendChatRequest(LANGUAGE_MODEL_ID, messages, {}, token);
     let result= "";
     for await (const fragment of chatResponse.stream) {

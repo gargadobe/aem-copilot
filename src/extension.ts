@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { AEM_COMMANDS as commands } from './aem.commands';
 import  { createCmdHandler } from './handlers/block.create';
-import { infoCmdHandler } from './handlers/block.overview';
+import { infoCmdHandler } from './handlers/block.info';
 import { enhanceBlock as enhanceCmdHandler } from './handlers/block.enhancer';
 import { defaultHandler } from './handlers/default';
 import { AEM_COMMAND_ID, LANGUAGE_MODEL_ID, PROCESS_COPILOT_CREATE_CMD } from './constants';
