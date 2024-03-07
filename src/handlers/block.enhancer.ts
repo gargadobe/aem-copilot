@@ -1,19 +1,19 @@
 import * as vscode from 'vscode';
 import  * as prompts  from  '../prompts/create.block'
 import { AEM_COMMANDS as commands } from '../aem.commands';
-import { AEM_COMMAND_ID } from '../constants';
+import { AEM_COMMAND_ID, LANGUAGE_MODEL_ID } from '../constants';
 
-export async function enhanceBlock(request: vscode.ChatRequest, access: any, stream: vscode.ChatResponseStream, token: vscode.CancellationToken) {
+export async function enhanceBlock(request: vscode.ChatRequest,stream: vscode.ChatResponseStream, token: vscode.CancellationToken) {
     const userMesage = request.prompt;
     const messages = [
-        new vscode.LanguageModelSystemMessage(prompts.CREATE_SYSTEM_MESSAGE),
-        new vscode.LanguageModelUserMessage(userMesage),
+        new vscode.LanguageModelChatSystemMessage(prompts.CREATE_SYSTEM_MESSAGE),
+        new vscode.LanguageModelChatUserMessage(userMesage),
     ];
-    const chatRequest = access.makeChatRequest(messages, {}, token);
+    const chatResponse = await vscode.lm.sendChatRequest(LANGUAGE_MODEL_ID, messages, {}, token);
     let result= "";
-    for await (const fragment of chatRequest.stream) {
-        stream.markdown(fragment);
-        result += fragment;
+    for await (const fragment of chatResponse.stream) {
+      stream.markdown(fragment);
+      result += fragment;
     }
     console.log(result);
     stream.button({
