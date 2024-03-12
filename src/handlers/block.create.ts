@@ -1,69 +1,81 @@
-import * as vscode from 'vscode';
-import * as prompts from '../prompts/create.block'
-import { AEM_COMMANDS as commands } from '../aem.commands';
-import { LANGUAGE_MODEL_ID, PROCESS_COPILOT_CREATE_CMD } from '../constants';
+import * as vscode from "vscode";
+import * as prompts from "../prompts/create.block";
+import { AEM_COMMANDS as commands } from "../aem.commands";
+import { LANGUAGE_MODEL_ID, PROCESS_COPILOT_CREATE_CMD } from "../constants";
 
-export async function createCmdHandler(request: vscode.ChatRequest,stream: vscode.ChatResponseStream, token: vscode.CancellationToken) {
-    const userMesage = request.prompt;
-    const messages = [
-        new vscode.LanguageModelChatSystemMessage(prompts.CREATE_SYSTEM_MESSAGE),
-        new vscode.LanguageModelChatUserMessage(userMesage),
-    ];
+export async function createCmdHandler(
+  request: vscode.ChatRequest,
+  stream: vscode.ChatResponseStream,
+  token: vscode.CancellationToken
+) {
+  const userMesage = request.prompt;
+  const messages = [
+    new vscode.LanguageModelChatSystemMessage(prompts.SYSTEM_MESSAGE),
+    new vscode.LanguageModelChatUserMessage(prompts.SAMPLE_USER_MESSAGE),
+    new vscode.LanguageModelChatAssistantMessage(
+      JSON.stringify(prompts.SAMPLE_ASSISTANT_OUTPUT)
+    ),
+    new vscode.LanguageModelChatAssistantMessage(userMesage),
+  ];
 
-    const progressStr = vscode.l10n.t("Creating AEM block...");
-    stream.progress(progressStr);
-    const chatResponse = await vscode.lm.sendChatRequest(LANGUAGE_MODEL_ID, messages, {}, token);
-    let result = "";
-    let resultJson = "";
-    let flag = false;
-    for await (const fragment of chatResponse.stream) {
-      if (flag || fragment.includes("->")) {
-        resultJson += fragment;
-        flag = true;
-      } else {
-        stream.markdown(fragment);
-        result += fragment;
-      }
-    }
-    console.log(result);
-    console.log(resultJson);
-    const blockJson: string = parseFileStringWithFilenames(resultJson);
+  const progressStr = vscode.l10n.t("Creating AEM block...");
+  stream.progress(progressStr);
+  const chatResponse = await vscode.lm.sendChatRequest(
+    LANGUAGE_MODEL_ID,
+    messages,
+    {},
+    token
+  );
 
-    stream.button({
-        command: PROCESS_COPILOT_CREATE_CMD,
-        title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD),
-    });
+  let resultJsonStr = "";
 
-    let resultObj = {
-        metadata: {
-            command: commands.CREATE
-        },
-        files: blockJson
-    }
+  for await (const fragment of chatResponse.stream) {
+    resultJsonStr += fragment;
+  }
 
-    return resultObj;
+  const blockMd: string = parseEDSblockJson(resultJsonStr);
+  console.log(blockMd);
+  stream.markdown(blockMd);
+    
+  stream.button({
+    command: PROCESS_COPILOT_CREATE_CMD,
+    title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD),
+  });
+
+  let resultObj = {
+    metadata: {
+      command: commands.CREATE,
+    },
+    files: JSON.parse(resultJsonStr).files,
+  };
+
+  return resultObj;
 }
 
-// create a function that parse the string and get a json object
-function parseFileStringWithFilenames(str: string): any {
-    const regex = /\[\s*{[\s\S]*?}\s*]/;
-    const match = str.match(regex);
-    let jsonObj = [];
+// parse the resultjson to create nice md string with
 
-    if (match) {
-        // The JSON part is in match[0]
-        let jsonStr = match[0];
-        try {
-            jsonObj = JSON.parse(jsonStr);
-            console.log(jsonObj); // This should log the parsed JSON object.
-        } catch (error) {
-            console.error("Error parsing JSON:", error);
-        }
-    } else {
-        console.error("No JSON found in the string");
-    }
-    return jsonObj;
+function parseEDSblockJson(resultJson: string) {
+  resultJson = resultJson.replace(/\\\\/g, "\\");
+  const blockJson = JSON.parse(resultJson);
+  const fileTreeMd = createFileTreeMd(blockJson.tree);
+    let mdString = `For Creating a block structure, the folder/file structure is as follows:\n
+    ${fileTreeMd}\nFile Content of each files are as follows:\n`;
+  for (const file of blockJson.files) {
+    mdString += `## ${file.path}\n\`\`\`${file.type}\n${file.content}\n\`\`\`\n`;
+  }
+  return mdString;
 }
 
-
-
+function createFileTreeMd(tree: any, depth = 0) {
+  let mdString = "";
+  const indent = "    ".repeat(depth);
+  if (tree.type === "directory") {
+    mdString += `${indent}${tree.name}\n`;
+    for (const child of tree.children) {
+      mdString += createFileTreeMd(child, depth + 1);
+    }
+  } else {
+    mdString += `${indent}├── ${tree.name}\n`;
+  }
+  return mdString;
+}

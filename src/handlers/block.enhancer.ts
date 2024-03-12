@@ -6,7 +6,7 @@ import { AEM_COMMAND_ID, LANGUAGE_MODEL_ID } from '../constants';
 export async function enhanceBlock(request: vscode.ChatRequest,stream: vscode.ChatResponseStream, token: vscode.CancellationToken) {
     const userMesage = request.prompt;
     const messages = [
-        new vscode.LanguageModelChatSystemMessage(prompts.CREATE_SYSTEM_MESSAGE),
+        new vscode.LanguageModelChatSystemMessage(prompts.SYSTEM_MESSAGE),
         new vscode.LanguageModelChatUserMessage(userMesage),
     ];
     const progressStr = vscode.l10n.t("Enhancing AEM block...");
