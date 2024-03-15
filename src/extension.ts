@@ -6,6 +6,7 @@ import { enhanceBlock as enhanceCmdHandler } from './handlers/block.enhancer';
 import { defaultHandler } from './handlers/default';
 import { AEM_COMMAND_ID, LANGUAGE_MODEL_ID, PROCESS_COPILOT_CREATE_CMD } from './constants';
 import { createFolderAndFiles } from './utils';
+import { authorContent } from './handlers/block.content.author';
 
 interface IAemChatResult extends vscode.ChatResult {
     metadata: {
@@ -30,6 +31,8 @@ export function activate(context: vscode.ExtensionContext) {
             cmdResult =  await createCmdHandler(request, stream, token);
         } else if (request.command == commands.ENHANCE) {
             cmdResult =  await enhanceCmdHandler(request, stream, token);
+        } else if (request.command == commands.AUTHOR) {
+            cmdResult =  await authorContent(request, stream, token);
         } else {
             cmdResult =  await defaultHandler(request, stream, token);
         }

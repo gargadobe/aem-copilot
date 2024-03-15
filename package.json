@@ -47,6 +47,9 @@
                     }, {
                         "name": "info",
                         "description": "Information About AEM EDS blocks"
+                    }, {
+                        "name": "author",
+                        "description": "Give the content block structure for a given block javscript file"
                     }
                 ]
             }

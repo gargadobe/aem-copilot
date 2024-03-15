@@ -9,8 +9,42 @@ export async function createCmdHandler(
   token: vscode.CancellationToken
 ) {
   const userMesage = request.prompt;
+
+  let systemMsg = prompts.SYSTEM_MESSAGE;
+
+  // read the project level scripts/scripts.js and put that in string to replace in the system message
+  let projectLevelScripts = "";
+  let projectLevelStyles = "";
+  const projectLevelScriptsUri = vscode.Uri.joinPath(
+    vscode.workspace.workspaceFolders![0].uri,
+    "scripts/scripts.js"
+  );
+  const projectLevelStylesUri = vscode.Uri.joinPath(
+    vscode.workspace.workspaceFolders![0].uri,
+    "styles/styles.css"
+  );
+  try {
+    const projectLevelScriptsFile = await vscode.workspace.fs.readFile(
+      projectLevelScriptsUri
+    );
+    projectLevelScripts = projectLevelScriptsFile.toString();
+  } catch (error) {
+    console.log("project level scripts file not found");
+  }
+  try {
+    const projectLevelStylesFile = await vscode.workspace.fs.readFile(
+      projectLevelStylesUri
+    );
+    projectLevelStyles = projectLevelStylesFile.toString();
+  } catch (error) {
+    console.log("project level styles file not found");
+  }
+  
+  systemMsg = systemMsg.replace("{project-level-scripts}", `scripts/scripts.js\n${projectLevelScripts}`);
+  systemMsg = systemMsg.replace("{project-level-styles}", `styles/styles.css\n${projectLevelStyles}`);
+
   const messages = [
-    new vscode.LanguageModelChatSystemMessage(prompts.SYSTEM_MESSAGE),
+    new vscode.LanguageModelChatSystemMessage(systemMsg),
     new vscode.LanguageModelChatUserMessage(prompts.SAMPLE_USER_MESSAGE),
     new vscode.LanguageModelChatAssistantMessage(
       JSON.stringify(prompts.SAMPLE_ASSISTANT_OUTPUT)
