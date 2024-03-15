@@ -46,7 +46,8 @@ export function activate(context: vscode.ExtensionContext) {
     // that appear when you type `/`.
     const aem = vscode.chat.createChatParticipant(AEM_COMMAND_ID, handler);
     aem.isSticky = true; // Assistant is persistant, whenever a user starts interacting with @aem, @aem will automatically be added to the following messages
-    aem.iconPath = vscode.Uri.joinPath(context.extensionUri, 'aem.png');
+    const path = vscode.Uri.joinPath(context.extensionUri, 'aem.jpeg');
+    aem.iconPath = path;
 
     // #TODO: Add followup provider  --> need to check
     aem.followupProvider = {
