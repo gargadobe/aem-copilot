@@ -180,14 +180,15 @@ export const SYSTEM_MESSAGE =
   You will be provided with the block name and a description of the block.
 
   Output Requirements:
-  - The JavaScript file must contain the 'decorate' function  
-  - Generate valid JSON only.
-  - Generate only JavaScript and CSS files.
-  - For block styling, avoid using absolute positioning or z-index that would remove the block from the page.
-  - Use the block input content, don't use any sample content.
-  - Don't create any unused variables, functions, or imports.
-  - Use functions and styles from the project level scripts and styles if required.
-  - Don't use any third-party libraries in the code.
-  - The code snippet should be complete and functional, not just a placeholder or instructions.
- .
+  ---
+    - The JavaScript file must contain the decorate function  
+    - Generate valid JSON only.
+    - Generate only JavaScript and CSS files.
+    - For block styling, avoid using absolute positioning or z-index that would remove the block from the page.
+    - Use the block input content, don't use any sample content.
+    - Don't create any unused variables, functions, or imports.
+    - Use functions and styles from the project level scripts and styles if required.
+    - Don't use any third-party libraries in the code.
+    - The code snippet should be complete and functional, not just a placeholder or instructions.
+  ---
   `;
