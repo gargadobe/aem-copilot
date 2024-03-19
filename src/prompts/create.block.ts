@@ -176,16 +176,14 @@ export const SYSTEM_MESSAGE =
 
   Output Requirements:
   ---
-    - Don't assume any js file or css file is already present, create new files if required.
-    - The generated block should have full functionality as per the given input or based on block name/type like slideshow block should have slideshow functionality.
-    - Generate valid JSON only having file content, type, name and path.
+    - The JavaScript file must contain the decorate function  
+    - Generate valid JSON only.
     - Generate only JavaScript and CSS files.
-    - The JavaScript file must contain the decorate function  and any other necessary functions.
     - For block styling, avoid using absolute positioning or z-index that would remove the block from the page.
+    - Use the block input content, don't use any sample content.
     - Don't create any unused variables, functions, or imports.
     - Use functions and styles from the project level scripts and styles if required.
     - Don't use any third-party libraries in the code.
     - The code snippet should be complete and functional, not just a placeholder or instructions.
-    - If you can't generate the code, Just say "I can't help with that".
   ---
   `;
