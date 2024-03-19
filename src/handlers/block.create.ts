@@ -67,21 +67,25 @@ export async function createCmdHandler(
     resultJsonStr += fragment;
   }
 
-  const blockMd: string = parseEDSblockJson(resultJsonStr);
-  console.log(blockMd);
-  stream.markdown(blockMd);
-    
-  stream.button({
-    command: PROCESS_COPILOT_CREATE_CMD,
-    title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD),
-  });
-
-  let resultObj = {
+  let resultObj: { metadata: { command: typeof commands.CREATE }; files?: any } = {
     metadata: {
-      command: commands.CREATE,
+    command: commands.CREATE,
     },
-    files: JSON.parse(resultJsonStr).files,
   };
+  try {
+    const blockMd: string = parseEDSblockJson(resultJsonStr);
+    console.log(blockMd);
+    stream.markdown(blockMd);
+    
+    stream.button({
+      command: PROCESS_COPILOT_CREATE_CMD,
+      title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD),
+    });
+    resultObj.files = JSON.parse(resultJsonStr).files;
+  } catch (error) {
+    console.log("Error parsing result json", error);
+    stream.markdown("Sorry I can't assist with that. Please try again..");
+  }
 
   return resultObj;
 }
@@ -89,15 +93,15 @@ export async function createCmdHandler(
 // parse the resultjson to create nice md string with
 
 function parseEDSblockJson(resultJson: string) {
-  resultJson = resultJson.replace(/\\\\/g, "\\");
-  const blockJson = JSON.parse(resultJson);
-  const fileTreeMd = createFileTreeMd(blockJson.tree);
+    resultJson = resultJson.replace(/\\\\/g, "\\");
+    const blockJson = JSON.parse(resultJson);
+    const fileTreeMd = createFileTreeMd(blockJson.tree);
     let mdString = `For Creating a block structure, the folder/file structure is as follows:\n
     ${fileTreeMd}\nFile Content of each files are as follows:\n`;
-  for (const file of blockJson.files) {
-    mdString += `## ${file.path}\n\`\`\`${file.type}\n${file.content}\n\`\`\`\n`;
-  }
-  return mdString;
+    for (const file of blockJson.files) {
+      mdString += `## ${file.path}\n\`\`\`${file.type}\n${file.content}\n\`\`\`\n`;
+    }
+    return mdString;
 }
 
 function createFileTreeMd(tree: any, depth = 0) {

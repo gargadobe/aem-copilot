@@ -50,6 +50,9 @@
                     }, {
                         "name": "author",
                         "description": "Give the content block structure for a given block javscript file"
+                    }, {
+                        "name": "collection",
+                        "description": "Pull a block from aem block collection repo"
                     }
                 ]
             }

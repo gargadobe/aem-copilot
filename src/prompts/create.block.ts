@@ -4,17 +4,6 @@ export const SAMPLE_USER_MESSAGE = `a tabs block with with following input block
     <div>Tab One</div>
     <div>Aliquando sadipscing eum ea, aliquid postulant qui in. Option <strong>vulputate</strong> an ius, everti <em>efficiendi</em> ex qui, inimicus liberavisse reprehendunt sit ei.</div>
   </div>
-  <div>
-    <div>Tab Two</div>
-    <div>
-      <p>Vocibus pericula temporibus id has, no quo omnium dolorem fuisset, ne quot brute gubergren per.</p>
-      <p>Cu errem fastidii maiestatis sed, mel at delectus erroribus. Mea porro postea nominavi at, sumo populo vix id. Vel at apeirian evertitur.</p>
-    </div>
-  </div>
-  <div>
-    <div>Tab Three</div>
-    <div>Te errem impedit vel.</div>
-  </div>
 </div>
 `; 
 
@@ -157,8 +146,9 @@ export const SAMPLE_ASSISTANT_OUTPUT = {
 
 export const SYSTEM_MESSAGE =
   `
-    You are an expert in creating AEM EDS blocks. Your task is to create a new AEM EDS block based on the instructions provided below.
+  You are an expert in creating AEM EDS blocks. Your task is to create a new AEM EDS full featured block based on the instructions provided below.
 
+  ---
     Steps to create a new AEM EDS block:
     1. Extract the block name from the user's input.
     2. Analyze the given HTML element for the block input, and create the necessary folder/file structures and sample code for each file.
@@ -168,27 +158,34 @@ export const SYSTEM_MESSAGE =
       - CSS File: Saved as block_name.css as block_name.css
       - Any other JavaScript files referenced by block_name.js, if necessary. You can create additional folders if required.
 
-  Additional Information:
+  ---
 
+  Additional Context for the task:
+
+  ---
   The AEM EDS block can use the project level scripts and styles mentioned below as needed.
   
-  Project Level Scripts: {project-level-scripts}
-  Project Level Styles: {project-level-styles}
+  Project Level functions: {project-level-scripts}
+  Project Level CSS: {project-level-styles}
 
   An EDS block JavaScript file starts with a function called 'decorate'. This function takes the block input, which is an HTML element, and decorates it. The block element contains the HTML structure of the block, which varies depending on the block type.
 
   You will be provided with the block name and a description of the block.
 
+  ---
+
   Output Requirements:
   ---
-    - The JavaScript file must contain the decorate function  
-    - Generate valid JSON only.
+    - Don't assume any js file or css file is already present, create new files if required.
+    - The generated block should have full functionality as per the given input or based on block name/type like slideshow block should have slideshow functionality.
+    - Generate valid JSON only having file content, type, name and path.
     - Generate only JavaScript and CSS files.
+    - The JavaScript file must contain the decorate function  and any other necessary functions.
     - For block styling, avoid using absolute positioning or z-index that would remove the block from the page.
-    - Use the block input content, don't use any sample content.
     - Don't create any unused variables, functions, or imports.
     - Use functions and styles from the project level scripts and styles if required.
     - Don't use any third-party libraries in the code.
     - The code snippet should be complete and functional, not just a placeholder or instructions.
+    - If you can't generate the code, Just say "I can't help with that".
   ---
   `;

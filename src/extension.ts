@@ -7,6 +7,7 @@ import { defaultHandler } from './handlers/default';
 import { AEM_COMMAND_ID, LANGUAGE_MODEL_ID, PROCESS_COPILOT_CREATE_CMD } from './constants';
 import { createFolderAndFiles } from './utils';
 import { authorContent } from './handlers/block.content.author';
+import { fetchBlock } from './handlers/block.collections';
 
 interface IAemChatResult extends vscode.ChatResult {
     metadata: {
@@ -33,6 +34,8 @@ export function activate(context: vscode.ExtensionContext) {
             cmdResult =  await enhanceCmdHandler(request, stream, token);
         } else if (request.command == commands.AUTHOR) {
             cmdResult =  await authorContent(request, stream, token);
+        } else if (request.command == commands.COLLECION) {
+            cmdResult =  await fetchBlock(request, stream, token);
         } else {
             cmdResult =  await defaultHandler(request, stream, token);
         }
@@ -65,6 +68,35 @@ export function activate(context: vscode.ExtensionContext) {
         ];
       },
     };
+
+
+    vscode.chat.registerChatVariableResolver(
+      "cat_context",
+      "Describes the state of mind and version of the cat",
+      {
+        resolve: (name, context, token) => {
+          if (name == "cat_context") {
+            const mood = Math.random() > 0.5 ? "happy" : "grumpy";
+            return [
+              {
+                level: vscode.ChatVariableLevel.Short,
+                value: "version 1.3 " + mood,
+              },
+              {
+                level: vscode.ChatVariableLevel.Medium,
+                value: "I am a playful cat, version 1.3, and I am " + mood,
+              },
+              {
+                level: vscode.ChatVariableLevel.Full,
+                value:
+                  "I am a playful cat, version 1.3, this version prefer to explain everything using mouse and tail metaphores. I am " +
+                  mood,
+              },
+            ];
+          }
+        },
+      }
+    );
 
 
     context.subscriptions.push(
