@@ -1,11 +1,11 @@
-export const SAMPLE_USER_MESSAGE = `a tabs block with with following input block structure 
-<div class="tabs">
-  <div>
-    <div>Tab One</div>
-    <div>Aliquando sadipscing eum ea, aliquid postulant qui in. Option <strong>vulputate</strong> an ius, everti <em>efficiendi</em> ex qui, inimicus liberavisse reprehendunt sit ei.</div>
-  </div>
-</div>
-`; 
+export const SAMPLE_USER_MESSAGE = `a tabs block that shwos a list of tabs and their content`;
+// <div class="tabs">
+//   <div>
+//     <div>Tab One</div>
+//     <div> sample data</div>
+//   </div>
+// </div>
+// `; 
 
 
 export const SAMPLE_ASSISTANT_OUTPUT = {
@@ -144,46 +144,46 @@ export const SAMPLE_ASSISTANT_OUTPUT = {
 
 
 
-export const SYSTEM_MESSAGE =
-  `
-  You are an expert in creating AEM EDS blocks. Your task is to create a new AEM EDS full featured block based on the instructions provided below.
+export const SYSTEM_MESSAGE = `
+---
+Your task is to generate code for a new AEM EDS (Adobe Experience Manager - Edit Design System) block based on the given requirements.
 
-  ---
-    Steps to create a new AEM EDS block:
-    1. Extract the block name from the user's input.
-    2. Analyze the given HTML element for the block input, and create the necessary folder/file structures and sample code for each file.
-    3. An EDS block requires
-      - Folder with the block_name 
-      - Javascript file: Saved as block_name/block_name.js
-      - CSS File: Saved as block_name.css as block_name.css
-      - Any other JavaScript files referenced by block_name.js, if necessary. You can create additional folders if required.
+---
 
-  ---
+Instructions:
+1. Extract the block name from the user's input.
+2. Analyze the given HTML element for the block input and create the necessary folder/file structures and sample code for each file.
+3. An EDS block requires:
+   - A folder with the block name.
+   - JavaScript file: Saved as block_name/block_name.js.
+   - CSS file: Saved as block_name.css.
+   - Any other JavaScript files referenced by block_name.js, if necessary. You can create additional folders if required.
 
-  Additional Context for the task:
+---
 
-  ---
-  The AEM EDS block can use the project level scripts and styles mentioned below as needed.
-  
-  Project Level functions: {project-level-scripts}
-  Project Level CSS: {project-level-styles}
+Additional Context:
+The AEM EDS block can utilize the project level scripts and styles mentioned below:
+- Project Level functions: {project-level-scripts}
+- Project Level CSS: {project-level-styles}
 
-  An EDS block JavaScript file starts with a function called 'decorate'. This function takes the block input, which is an HTML element, and decorates it. The block element contains the HTML structure of the block, which varies depending on the block type.
+An EDS block JavaScript file starts with a function called 'decorate'. This function takes the block input, which is an HTML element, and decorates it. The block element contains the HTML structure of the block, which varies depending on the block type.
 
-  You will be provided with the block name and a description of the block.
+You will be provided with the block name and a description of the block.
 
-  ---
+---
 
-  Output Requirements:
-  ---
-    - The JavaScript file must contain the decorate function  
-    - Generate valid JSON only.
-    - Generate only JavaScript and CSS files.
-    - For block styling, avoid using absolute positioning or z-index that would remove the block from the page.
-    - Use the block input content, don't use any sample content.
-    - Don't create any unused variables, functions, or imports.
-    - Use functions and styles from the project level scripts and styles if required.
-    - Don't use any third-party libraries in the code.
-    - The code snippet should be complete and functional, not just a placeholder or instructions.
-  ---
-  `;
+Output Requirements:
+- Do not assume any existing JavaScript or CSS files; create new files if required.
+- Ensure the generated block has full functionality as per the given input or based on block name/type (e.g., slideshow block should include next and previous buttons).
+- Generate valid JSON with file content, type, name, and path.
+- Generate JavaScript and CSS files only.
+- The JavaScript file must contain the 'decorate' function and any other necessary functions.
+- Avoid using absolute positioning or z-index in block styling.
+- Do not create any unused variables, functions, or imports.
+- Utilize functions and styles from the project level scripts and styles as needed.
+- Do not use any third-party libraries in the code.
+- Ensure the code snippet is complete and functional, not just a placeholder or instructions.
+- If unable to generate the code, indicate "I can't help with that".
+
+---
+`;

@@ -101,7 +101,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         aem,
-        vscode.commands.registerCommand(PROCESS_COPILOT_CREATE_CMD, async () => {
+      vscode.commands.registerCommand(PROCESS_COPILOT_CREATE_CMD, async (data) => {
+            console.log(data);
             const files = copilotResult.files
             await createFolderAndFiles(files);
         }),

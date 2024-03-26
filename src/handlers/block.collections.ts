@@ -27,7 +27,8 @@ export async function fetchBlock(
   };
 
   if (!BLOCK_COLLECTION_LIST.includes(blockName)) {
-    const errorMsg = vscode.l10n.t("Block not found in collection");
+    const errorMsg = vscode.l10n.t(`Block not found in collection \n here is the list of available blocks: \n\n  - ${BLOCK_COLLECTION_LIST.join("\n - ")}`);
+    console.log(errorMsg);
     stream.markdown(errorMsg);
   } else {
     const files = await fetchAEMBlock(blockName, stream);
@@ -80,6 +81,11 @@ async function fetchAEMBlock(
 
   return blockJson;
 }
+
+//  prompt: "How to build AEM blocks?",
+//             label: vscode.l10n.t("Build with AEM"),
+//   command: commands.INFO,
+    
 
 // async function getGitHubFolderContents(blockName: string, stream: vscode.ChatResponseStream, path?: string) {
 //     try {
