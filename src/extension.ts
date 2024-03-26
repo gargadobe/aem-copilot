@@ -15,16 +15,12 @@ interface IAemChatResult extends vscode.ChatResult {
     }
 }
 
-
 export function activate(context: vscode.ExtensionContext) {
 
     let copilotResult: any
 
     // Define a AEM chat handler. 
     const handler: vscode.ChatRequestHandler = async (request: vscode.ChatRequest, context2: vscode.ChatContext, stream: vscode.ChatResponseStream, token: vscode.CancellationToken): Promise<IAemChatResult> => {
-        // To talk to an LLM in your subcommand handler implementation, your
-        // extension can use VS Code's `requestChatAccess` API to access the Copilot API.
-        // The GitHub Copilot Chat extension implements this provider.
         let cmdResult: any;
         if (request.command == commands.INFO) {
             cmdResult =  await infoCmdHandler(request,  stream, token);
@@ -39,16 +35,13 @@ export function activate(context: vscode.ExtensionContext) {
         } else {
             cmdResult =  await defaultHandler(request, stream, token);
         }
-        copilotResult = cmdResult;
-        
+      
+        copilotResult = cmdResult;     
         return cmdResult.metadata;
     };
 
-    // Chat participants appear as top-level options in the chat input
-    // when you type `@`, and can contribute sub-commands in the chat input
-    // that appear when you type `/`.
+ 
     const aem = vscode.chat.createChatParticipant(AEM_COMMAND_ID, handler);
-    aem.isSticky = true; // Assistant is persistant, whenever a user starts interacting with @aem, @aem will automatically be added to the following messages
     const path = vscode.Uri.joinPath(context.extensionUri, 'aem.jpeg');
     aem.iconPath = path;
 

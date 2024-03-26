@@ -34,8 +34,10 @@
      "contributes": {
         "chatParticipants": [
             {
+                "id": "aem",
                 "name": "aem",
                 "description": "AEM Assistant to help with blocks developement",
+                "isSticky": true,
                 "commands": [
                     {
                         "name": "create",
