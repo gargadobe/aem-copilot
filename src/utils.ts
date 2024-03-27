@@ -21,6 +21,18 @@ export async function createFolderAndFiles(files: any[]): Promise<void> {
         cancellable: false,
       },
       async (progress) => {
+
+
+        if (files.length > 0) { 
+          // split files[0] by / and if first starts with blocks and second would represent the block name , check if that folder exist then delete that
+          const blockName = files[0].path.split("/")[1];
+          const blockPath = path.join(baseUri.fsPath, "/blocks/" + blockName);
+          if (fs.existsSync(blockPath
+          )) {
+            fs.rmdirSync(blockPath, { recursive: true });
+          }
+        }
+
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
           const newFilePath = vscode.Uri.joinPath(baseUri, file.path);
