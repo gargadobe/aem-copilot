@@ -207,7 +207,8 @@ Generate the Output as follows:
 - Do not assume any existing JavaScript or CSS files.
 - Ensure the generated block has full functionality as per the given input or based on block name/type (e.g., slideshow block should include next and previous buttons).
 - The JavaScript file must contain the 'decorate' function and any other necessary functions.
-- In css content, add fix height and width for the block so that it can be displayed properly. 
+- In css content, add fix height and width for the block so that it can be displayed properly.
+- Don't add any style in javascript file. Use css file for styling.
 - Do not create any unused variables, functions, or imports.
 - Do not use any third-party libraries in the code.
 - Ensure the code snippet is complete and functional, not just a placeholder or instructions.
