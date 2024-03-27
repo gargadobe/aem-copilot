@@ -1,4 +1,4 @@
-export const SAMPLE_USER_MESSAGE = `a tabs block that shwos a list of tabs and their content`;
+export const SAMPLE_USER_MESSAGE = `a tabs block that show a list of tabs and their content`;
 
 export const SAMPLE_ASSISTANT_OUTPUT = {
   tree: {
@@ -160,16 +160,21 @@ A table in markdown represent the input block structure. First row contains the 
 An image url in cell is represented as picture element with src attribute as the image url inside the cell div element. Row and cell divs don't have class in inputHtml.
 
 | TestBlock      |
-|----------------|
-| Sample text    |
+|----------------| --------------|
+| row1cell1      |  img_url      |
+| row2cell1      |  row2cell2    |
 
 
 the html stucture for same would be:
 
 <div class="testblock block" data-block-name="testblock" data-block-status="loaded">
   <div>
-    <div>Sample text</div>
+    <div>row1cell1</div>
+    <div><img src="img_url"/> </div>
   </div>
+  <div>
+    <div>row2cell1</div>
+    <div>row2cell2</div>
 </div>
 
 Instructions:
@@ -197,17 +202,15 @@ You will be provided with the block name and a description of the block.
 
 ---
 
-Output Requirements:
+Generate the Output as follows:
 - Strictly generate the valid JSON only.
 - Do not assume any existing JavaScript or CSS files.
 - Ensure the generated block has full functionality as per the given input or based on block name/type (e.g., slideshow block should include next and previous buttons).
 - The JavaScript file must contain the 'decorate' function and any other necessary functions.
-- Avoid using absolute positioning or z-index in block styling.
+- In css content, add fix height and width for the block so that it can be displayed properly. 
 - Do not create any unused variables, functions, or imports.
-- Utilize functions and styles from the project level scripts and styles as needed.
 - Do not use any third-party libraries in the code.
 - Ensure the code snippet is complete and functional, not just a placeholder or instructions.
 - If unable to generate the code, indicate "I can't help with that".
-
 ---
 `;
