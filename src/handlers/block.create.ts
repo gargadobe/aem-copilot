@@ -40,7 +40,7 @@ export async function createCmdHandler(
     console.log("project level styles file not found");
   }
   
-  systemMsg = systemMsg.replace("{project-level-scripts}", `scripts/scripts.js\n${projectLevelScripts}`);
+  // systemMsg = systemMsg.replace("{project-level-scripts}", `scripts/scripts.js\n${projectLevelScripts}`);
   systemMsg = systemMsg.replace("{project-level-styles}", `styles/styles.css\n${projectLevelStyles}`);
 
   const messages = [
@@ -73,8 +73,9 @@ export async function createCmdHandler(
     },
   };
   try {
+    console.log(resultJsonStr);
     const blockMd: string = parseEDSblockJson(resultJsonStr);
-    console.log(blockMd);
+    // console.log(blockMd);
     stream.markdown(blockMd);
     
     stream.button({
@@ -101,6 +102,12 @@ function parseEDSblockJson(resultJson: string) {
     for (const file of blockJson.files) {
       mdString += `## ${file.path}\n\`\`\`${file.type}\n${file.content}\n\`\`\`\n`;
     }
+    if (blockJson.mdtable) {
+      mdString += `\n Corresponding table for block should be: \n ${blockJson.mdtable}`;
+    }
+   if (blockJson.inputHtml) {
+     mdString += `\n Corresponding blockinput is:\n\`\`\`${blockJson.inputHtml}\n\`\`\`\n`;
+   }
     return mdString;
 }
 
