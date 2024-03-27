@@ -157,7 +157,7 @@ Your task is to generate JSON for new AEM EDS (Adobe Experience Manager - Edit D
 ---
 An EDS block basically decorate the input html element with the required functionality. Input html element contains the structure of the block which varies based on the block type.
 A table in markdown represent the input block structure. First row contains the block name and rest of rows contains the block structure. Every row is div element and every cell is a div element inside the row div element.
-An image url in cell is represented as picture element with src attribute as the image url inside the cell div element. Row and cell divs don't have class in inputHtml.
+An image url in cell is represented as picture element with src attribute as the image url inside the cell div element. Row and cell divs don't have class in inputHtml. there will be just div or img tag in input html which we have to decorate in eds block.
 
 | TestBlock      |
 |----------------| --------------|

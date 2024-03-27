@@ -39,9 +39,12 @@ export async function createCmdHandler(
   } catch (error) {
     console.log("project level styles file not found");
   }
-  
+
   // systemMsg = systemMsg.replace("{project-level-scripts}", `scripts/scripts.js\n${projectLevelScripts}`);
-  systemMsg = systemMsg.replace("{project-level-styles}", `styles/styles.css\n${projectLevelStyles}`);
+  systemMsg = systemMsg.replace(
+    "{project-level-styles}",
+    `styles/styles.css\n${projectLevelStyles}`
+  );
 
   const messages = [
     new vscode.LanguageModelChatSystemMessage(systemMsg),
@@ -67,9 +70,12 @@ export async function createCmdHandler(
     resultJsonStr += fragment;
   }
 
-  let resultObj: { metadata: { command: typeof commands.CREATE }; files?: any } = {
+  let resultObj: {
+    metadata: { command: typeof commands.CREATE };
+    files?: any;
+  } = {
     metadata: {
-    command: commands.CREATE,
+      command: commands.CREATE,
     },
   };
   try {
@@ -77,7 +83,7 @@ export async function createCmdHandler(
     const blockMd: string = parseEDSblockJson(resultJsonStr);
     // console.log(blockMd);
     stream.markdown(blockMd);
-    
+
     stream.button({
       command: PROCESS_COPILOT_CREATE_CMD,
       title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD),
@@ -94,21 +100,21 @@ export async function createCmdHandler(
 // parse the resultjson to create nice md string with
 
 function parseEDSblockJson(resultJson: string) {
-    resultJson = resultJson.replace(/\\\\/g, "\\");
-    const blockJson = JSON.parse(resultJson);
-    const fileTreeMd = createFileTreeMd(blockJson.tree);
-    let mdString = `For Creating a block structure, the folder/file structure is as follows:\n
+  resultJson = resultJson.replace(/\\\\/g, "\\");
+  const blockJson = JSON.parse(resultJson);
+  const fileTreeMd = createFileTreeMd(blockJson.tree);
+  let mdString = `For Creating a block structure, the folder/file structure is as follows:\n
     ${fileTreeMd}\nFile Content of each files are as follows:\n`;
-    for (const file of blockJson.files) {
-      mdString += `## ${file.path}\n\`\`\`${file.type}\n${file.content}\n\`\`\`\n`;
-    }
-    if (blockJson.mdtable) {
-      mdString += `\n Corresponding table for block should be: \n ${blockJson.mdtable}`;
-    }
-   if (blockJson.inputHtml) {
-     mdString += `\n Corresponding blockinput is:\n\`\`\`${blockJson.inputHtml}\n\`\`\`\n`;
-   }
-    return mdString;
+  for (const file of blockJson.files) {
+    mdString += `## ${file.path}\n\`\`\`${file.type}\n${file.content}\n\`\`\`\n`;
+  }
+  if (blockJson.mdtable) {
+    mdString += `\n Corresponding table for block should be: \n ${blockJson.mdtable}`;
+  }
+  if (blockJson.inputHtml) {
+    mdString += `\n Corresponding blockinput is:\n\`\`\`${blockJson.inputHtml}\n\`\`\`\n`;
+  }
+  return mdString;
 }
 
 function createFileTreeMd(tree: any, depth = 0) {

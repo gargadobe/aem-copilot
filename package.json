@@ -1,76 +1,75 @@
 {
-    "name": "chat-sample",
-    "publisher": "vscode-samples",
-    "displayName": "Copilot Chat Sample",
-    "description": "Sample chat extension, a trusty cat that will help you with your code.",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/Microsoft/vscode-extension-samples"
-    },
-    "version": "0.1.0",
-    "engines": {
-        "vscode": "^1.88.0"
-    },
-    "extensionDependencies": [
-        "github.copilot-chat"
-    ],
-    "categories": [
-        "Other"
-    ],
-    "activationEvents": [
-        "onStartupFinished"
-    ],
-    "enabledApiProposals": [
-        "chatParticipant",
-		"chatVariableResolver",
-        "languageModels"
-    ],
-    "main": "./out/extension.js",
-    "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./"
-    },
-     "contributes": {
-        "chatParticipants": [
-            {
-                "id": "aem",
-                "name": "aem",
-                "description": "AEM Assistant to help with blocks developement",
-                "isSticky": true,
-                "commands": [
-                    {
-                        "name": "create",
-                        "description": "Given a block name, create corresponding files"
-                    },
-                    {
-                        "name": "enhance",
-                        "description": "Enhance an existing AEM EDS block"
-                    }, {
-                        "name": "info",
-                        "description": "Information About AEM EDS blocks"
-                    }, {
-                        "name": "author",
-                        "description": "Give the content block structure for a given block javscript file"
-                    }, {
-                        "name": "collection",
-                        "description": "Pull a block from aem block collection repo"
-                    }
-                ]
-            }
-        ],
+  "name": "chat-sample",
+  "publisher": "vscode-samples",
+  "displayName": "Copilot Chat Sample",
+  "description": "Sample chat extension, a trusty cat that will help you with your code.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Microsoft/vscode-extension-samples"
+  },
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.88.0"
+  },
+  "extensionDependencies": [
+    "github.copilot-chat"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "enabledApiProposals": [
+    "chatParticipant",
+    "chatVariableResolver",
+    "languageModels"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "aem",
+        "name": "aem",
+        "description": "AEM Assistant to help with blocks developement",
+        "isSticky": true,
         "commands": [
-            {
-                "command": "cat.namesInEditor",
-                "title": "Use Cat Names in Editor"
-            }
+          {
+            "name": "create",
+            "description": "Given a block name, create corresponding files"
+          },
+          {
+            "name": "enhance",
+            "description": "Enhance an existing AEM EDS block"
+          },
+          {
+            "name": "info",
+            "description": "Information About AEM EDS blocks"
+          },
+          {
+            "name": "collection",
+            "description": "Pull a block from aem block collection repo"
+          }
         ]
-    },
-    "devDependencies": {
-        "@types/node": "^20.5.9",
-        "@types/vscode": "1.82.0",
-        "eslint": "^7.22.0",
-        "tslint": "^6.1.3",
-        "typescript": "^4.0.3"
-    }
+      }
+    ],
+    "commands": [
+      {
+        "command": "cat.namesInEditor",
+        "title": "Use Cat Names in Editor"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.9",
+    "@types/vscode": "1.82.0",
+    "eslint": "^7.22.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.0.3"
+  }
 }
