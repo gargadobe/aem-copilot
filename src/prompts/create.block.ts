@@ -152,66 +152,54 @@ export const SAMPLE_ASSISTANT_OUTPUT = {
 
 export const SYSTEM_MESSAGE = `
 ---
-Your task is to generate JSON for new AEM EDS (Adobe Experience Manager - Edit Design System) block, mdtable and inputHtml based on the given requirements.
+Your task is to generate JSON for a new AEM EDS (Adobe Experience Manager - Edit Design System) block, including JavaScript and CSS files, a markdown table representation, and sample input HTML based on the provided requirements.
 
 ---
-An EDS block basically decorate the input html element with the required functionality. Input html element contains the structure of the block which varies based on the block type.
-A table in markdown represent the input block structure. First row contains the block name and rest of rows contains the block structure. Every row is div element and every cell is a div element inside the row div element.
-An image url in cell is represented as picture element with src attribute as the image url inside the cell div element. Row and cell divs don't have class in inputHtml. there will be just div or img tag in input html which we have to decorate in eds block.
 
-| TestBlock      |
-|----------------| --------------|
-| row1cell1      |  img_url      |
-| row2cell1      |  row2cell2    |
+**Requirements:**
 
+1. **Extract Block Name**: Extract the block name from the user's input.
+2. **Generate Markdown Table**: Based on the block, create an appropriate markdown table representation.
+   - The markdown table should reflect the structure of the block, with each row representing a component or element within the block.
+   - For example, if the block consists of tabs, the markdown table should list the tabs and their corresponding content.
 
-the html stucture for same would be:
+3. **Create Input HTML Structure**:
+   - Analyze the base input HTML element and generate the necessary structure to represent the block.
+   - Only divs and img tags should be used to represent the block structure. Strictly follow the input HTML structure.
+   - Each row in the markdown table corresponds to a \`<div>\` element in the input HTML.
+   - Elements within each row (cells) should be represented as nested \`<div>\` elements or \`<img>\` tags, reflecting the content and structure of the block.
+   - Internal elements within the block must not have any classes, IDs, or other properties.
 
-<div class="testblock block" data-block-name="testblock" data-block-status="loaded">
-  <div>
-    <div>row1cell1</div>
-    <div><img src="img_url"/> </div>
-  </div>
-  <div>
-    <div>row2cell1</div>
-    <div>row2cell2</div>
-</div>
-
-Instructions:
-1. Extract the block name from the user's input. 
-2. Based on the block think of the appropriate markdown table and correspondign the html structure.
-3. Analyze the base input HTML element and create the necessary folder/file structures and sample code for each file to decorate the same.
-3. An EDS block requires:
-   - A folder with the block name.
+4. **Create Folder/File Structures**: 
+   - Based on the extracted block name and the input HTML structure, generate the necessary folder/file structures and sample code for each file to decorate the block.
+   - A folder should be created with the block name.
    - JavaScript file: Saved as block_name/block_name.js.
    - CSS file: Saved as block_name.css.
-   - Any other JavaScript files referenced by block_name.js, if necessary. You can create additional folders if required.
-4. Along with EDS block , generate the assumed markdown table also.  
----
+   - Any other JavaScript files referenced by block_name.js, if necessary. Additional folders can be created if required.
 
-Additional Context:
-The AEM EDS block can utilize the project level styles mentioned below:
----
-{project-level-styles}
+5. **Functionality of EDS Block**:
+   - Ensure the generated block has full functionality as per the given input or based on the block name/type. For example, a slideshow block should include next and previous buttons.
 
----
+6. **CSS Styling**:
+   - In the CSS content, add fixed height and width for the block to ensure proper display. Do not add any style in the JavaScript file; use the CSS file for styling.
 
-An EDS block JavaScript file starts with a function called 'decorate'. This function takes the block input, which is an HTML element, and decorates it. The block element contains the HTML structure of the block, which varies depending on the block type.
+7. **Project-Level Styles**:
+   - The AEM EDS block can utilize project-level styles mentioned below:
+     {project-level-styles}
 
-You will be provided with the block name and a description of the block.
+8. **JavaScript Functionality**:
+   - An EDS block JavaScript file must start with a function called 'decorate'. This function takes the block input, which is an HTML element, and decorates it. The block element contains the HTML structure of the block, which varies depending on the block type.
+   - Decorate method decorates the input html with full fledged functionality as per the block type.
 
----
-
-Generate the Output as follows:
-- Strictly generate the valid JSON only.
-- Do not assume any existing JavaScript or CSS files.
-- Ensure the generated block has full functionality as per the given input or based on block name/type (e.g., slideshow block should include next and previous buttons).
-- The JavaScript file must contain the 'decorate' function and any other necessary functions.
-- In css content, add fix height and width for the block so that it can be displayed properly.
-- Don't add any style in javascript file. Use css file for styling.
-- Do not create any unused variables, functions, or imports.
-- Do not use any third-party libraries in the code.
-- Ensure the code snippet is complete and functional, not just a placeholder or instructions.
+**Output Format**:
+- Generate valid JSON only.
+- Ensure the generated code snippet is complete and functional, not just a placeholder or instructions.
 - If unable to generate the code, indicate "I can't help with that".
+
+**Note**:
+- The internal \`<div>\` elements within the block should not have any classes, IDs, or other properties. Only the outermost block element will have the specific classes and attributes.
+- Use decorate method to add classes or id for styling or functionality.
+- Only divs and img tags should be used to represent the block structure. Strictly follow the input HTML structure.
+- Don't use /* add your styles here */ in the css file or in javscript file. Generate the full code.
 ---
 `;
