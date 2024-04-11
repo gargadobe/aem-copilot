@@ -17,27 +17,31 @@ export async function fetchBlock(
     "Fetching Block From Block Collection ...🤔"
   );
   stream.progress(progressStr);
-  let resultObj: {
-    metadata: { command: typeof commands.COLLECION };
-    files?: any;
-  } = {
+  if (blockName === "ls") {
+   const listblock = vscode.l10n.t(
+     `List of available blocks: \n\n  - ${BLOCK_COLLECTION_LIST.join(
+       "\n - "
+     )}`
+   );
+   stream.markdown(listblock);
+  }
+  else if (!BLOCK_COLLECTION_LIST.includes(blockName)) {
+    const errorMsg = vscode.l10n.t(`Block not found in collection \n here is the list of available blocks: \n\n  - ${BLOCK_COLLECTION_LIST.join("\n - ")}`);
+    stream.markdown(errorMsg);
+  } else {
+    const files = await fetchAEMBlock(blockName, stream);
+    stream.button({
+      command: PROCESS_COPILOT_CREATE_CMD,
+      title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD),
+      arguments: [files],
+    });
+  }
+  const resultObj = {
     metadata: {
       command: commands.COLLECION,
     },
   };
 
-  if (!BLOCK_COLLECTION_LIST.includes(blockName)) {
-    const errorMsg = vscode.l10n.t(`Block not found in collection \n here is the list of available blocks: \n\n  - ${BLOCK_COLLECTION_LIST.join("\n - ")}`);
-    console.log(errorMsg);
-    stream.markdown(errorMsg);
-  } else {
-    const files = await fetchAEMBlock(blockName, stream);
-    resultObj["files"] = files;
-    stream.button({
-            command: PROCESS_COPILOT_CREATE_CMD,
-            title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD),
-        });
-  }
   return resultObj;
 }
 
@@ -46,7 +50,18 @@ async function fetchAEMBlock(
   stream: vscode.ChatResponseStream
 ) {
   let blockJson = [];
-  stream.markdown(`Here is ${blockName} from AEM block collection\n\n`);
+
+  const fileTreeMd = `
+    ${blockName}
+    ├── ${blockName}.js
+    └── ${blockName}.css
+  `;
+
+  let mdString = `The folder/file structure is as follows:\n
+    ${fileTreeMd}\nFile Content of each files are as follows:\n\n`;
+  
+  stream.markdown(mdString);
+  
   const blockJsURL = `${AEM_BLOCK_COLLECTION_URL}/${blockName}/${blockName}.js`;
   const blockCSSURL = `${AEM_BLOCK_COLLECTION_URL}/${blockName}/${blockName}.css`;
   const response = await fetch(blockJsURL);

@@ -1,25 +1,18 @@
-# Copilot Chat
+# AEM Developer Copilot Guide
+AEM developer copilot is github copilot chat extension that leverages git copilot GenAI capablities with provided eds context provides eds expertise at devloper fingertips in their developement environment itself. 
 
-This shows
+# Features and Commands:
 
-- Get Info about AEM blocks.
-- Create AEM block.
-- How to respond with follow-ups.
-
-![demo](./demo2.png)
-
-## Running the Sample
-
-- Run `npm install` in terminal to install dependencies
-- Run the `Run Extension` target in the Debug View. This will:
-	- Start a task `npm: watch` to compile the code
-	- Run the extension in a new VS Code window
+- **Create**: Streamline the development of EDS blocks with LLM using Copilot LLM. This feature eliminates the need for manual creation of EDS folders/files, enhancing the overall developer experience.
+  
+- **Collection**: Access standard blocks from the AEM block collection directly, eliminating the need to copy and paste blocks from the block-collection repository and increase the adoption of standard blocks.
+  
+- **Info**: Retrieve any EDS-related information directly within your development environment through a simple prompt, avoiding the need to leave your workspace.
 
 
 
-## Common issue
+![demo](./demo.png)
 
-Clear cache- rm -rf  ~/Library/Application\ Support/Code\ -\ Insiders/Cache*
 
 ## References
 

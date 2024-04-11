@@ -43,11 +43,11 @@ export async function infoCmdHandler(
     stream.markdown(fragment);
     result += fragment;
   }
-  console.log(result);
-  stream.button({
-    command: AEM_COMMAND_ID,
-    title: vscode.l10n.t(AEM_COMMAND_ID),
-  });
+  // console.log(result);
+  // stream.button({
+  //   command: AEM_COMMAND_ID,
+  //   title: vscode.l10n.t(AEM_COMMAND_ID),
+  // });
 
   const resultObj = {
     metadata: {

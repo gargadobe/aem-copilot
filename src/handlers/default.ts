@@ -15,6 +15,17 @@ export async function defaultHandler(request: vscode.ChatRequest, stream: vscode
       stream.markdown(fragment);
     }
 
+    const testFn = {
+        "bingo": "fda",
+        "fdas": "fds"
+   }
+
+   stream.button({
+     command: "test",
+     title: vscode.l10n.t("test"),
+     arguments: [testFn , stream, token],
+   });
+
     const resultObj  = {
         metadata: {
             command: commands.INFO

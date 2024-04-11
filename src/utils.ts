@@ -21,8 +21,6 @@ export async function createFolderAndFiles(files: any[]): Promise<void> {
         cancellable: false,
       },
       async (progress) => {
-
-
         if (files.length > 0) { 
           // split files[0] by / and if first starts with blocks and second would represent the block name , check if that folder exist then delete that
           const blockName = files[0].path.split("/")[1];
@@ -129,4 +127,39 @@ function getFilePaths(fileTree: string): File[] {
 
   result = result.filter((file) => file.name.includes("."));
   return result;
+}
+
+
+// parse the resultjson to create nice md string with
+
+export function parseEDSblockJson(resultJson: string) {
+  resultJson = resultJson.replace(/\\\\/g, "\\");
+  const blockJson = JSON.parse(resultJson);
+  const fileTreeMd = createFileTreeMd(blockJson.tree);
+  let mdString = `For Creating a block structure, the folder/file structure is as follows:\n
+    ${fileTreeMd}\nFile Content of each files are as follows:\n`;
+  for (const file of blockJson.files) {
+    mdString += `## ${file.path}\n\`\`\`${file.type}\n${file.content}\n\`\`\`\n`;
+  }
+  if (blockJson.mdtable) {
+    mdString += `\n Corresponding table for block should be: \n ${blockJson.mdtable}\n\n`;
+  }
+  // if (blockJson.inputHtml) {
+  //   mdString += `\n Corresponding blockinput is:  \n\`\`\`${blockJson.inputHtml}\n\`\`\`\n`;
+  // }
+  return mdString;
+}
+
+function createFileTreeMd(tree: any, depth = 0) {
+  let mdString = "";
+  const indent = "    ".repeat(depth);
+  if (tree.type === "directory") {
+    mdString += `${indent}${tree.name}\n`;
+    for (const child of tree.children) {
+      mdString += createFileTreeMd(child, depth + 1);
+    }
+  } else {
+    mdString += `${indent}├── ${tree.name}\n`;
+  }
+  return mdString;
 }
