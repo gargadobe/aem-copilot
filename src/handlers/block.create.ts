@@ -2,50 +2,36 @@ import * as vscode from "vscode";
 import * as prompts from "../prompts/create.block";
 import { AEM_COMMANDS as commands } from "../aem.commands";
 import {
-  LANGUAGE_MODEL_ID,
   PROCESS_COPILOT_CREATE_CMD,
 } from "../constants";
 import { parseEDSblockJson } from "../utils";
 import { blockTemplates } from "../block.templates";
 
-async function getSelectedOption() {
-  const options = Object.keys(blockTemplates).map((block) => ({
-    label: block,
-  }));
+const MODEL_SELECTOR: vscode.LanguageModelChatSelector = { vendor: 'copilot', family: 'gpt-3.5-turbo' };
+const STYLES_PATH = "styles/styles.css";
 
-  options.push({ label: "None" });
-  const selectedOption = await vscode.window.showQuickPick(options, {
-    placeHolder: vscode.l10n.t("Select the base EDS block template"),
-  });
-  return selectedOption?.label || "tabs";
-}
-
-async function getProjectLevelStyles() {
-  let projectLevelStyles = "";
+async function getProjectLevelStyles(): Promise<string> {
+ try {
   const projectLevelStylesUri = vscode.Uri.joinPath(
     vscode.workspace.workspaceFolders![0].uri,
-    "styles/styles.css"
+    STYLES_PATH
   );
-  try {
+
     const projectLevelStylesFile = await vscode.workspace.fs.readFile(
       projectLevelStylesUri
     );
-    projectLevelStyles = projectLevelStylesFile.toString();
+    return projectLevelStylesFile.toString();
   } catch (error) {
-    console.log("project level styles file not found");
+    console.error("Error reading project level styles", error);
+   return "";
   }
-  return projectLevelStyles;
 }
 
-async function getChatResponse(messages: vscode.LanguageModelChatMessage[], token: vscode.CancellationToken) {
+async function getChatResponse(messages: vscode.LanguageModelChatMessage[], token: vscode.CancellationToken): Promise<string> {
   let resultJsonStr = "";
-  const chatResponse = await vscode.lm.sendChatRequest(
-    LANGUAGE_MODEL_ID,
-    messages,
-    {},
-    token
-  );
-  for await (const fragment of chatResponse.stream) {
+  const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
+  const chatResponse = await model.sendRequest(messages, {}, token);
+  for await (const fragment of chatResponse.text) {
     resultJsonStr += fragment;
   }
   return resultJsonStr;
@@ -55,11 +41,7 @@ export async function createCmdHandler(
   request: vscode.ChatRequest,
   stream: vscode.ChatResponseStream,
   token: vscode.CancellationToken
-) {
-
-  // const progressStr = vscode.l10n.t("Selecting the base EDS block template...");
-  // stream.progress(progressStr);
-  
+): Promise<{ metadata: { command: string } }> {
 
   const templateName = "None";
   if (templateName === "None") { 
@@ -81,12 +63,12 @@ export async function createCmdHandler(
   let projectLevelStyles = await getProjectLevelStyles();
   systemMsg = systemMsg.replace(
     "{project-level-styles}",
-    `styles/styles.css\n${projectLevelStyles}`
+    `${STYLES_PATH}\n${projectLevelStyles}`
   );
 
   const messages = [
-    new vscode.LanguageModelChatSystemMessage(systemMsg),
-    new vscode.LanguageModelChatAssistantMessage(userMsg),
+    vscode.LanguageModelChatMessage.User(systemMsg),
+    vscode.LanguageModelChatMessage.User(userMsg),
   ];
 
   try {
@@ -100,74 +82,52 @@ export async function createCmdHandler(
       arguments: [JSON.parse(resultJsonStr).files],
     });
   } catch (error) {
-    console.log("Error parsing result json ", error);
+    console.error("Error parsing result json ", error);
     stream.markdown("Sorry I can't assist with that. Please try again..");
   }
 
-  const resultObj = {
+  return {
     metadata: {
       command: commands.CREATE,
     },
   };
-
-  return resultObj;
 }
-
-
 
 async function createCmdHandlerWithoutTemplate(
   request: vscode.ChatRequest,
   stream: vscode.ChatResponseStream,
   token: vscode.CancellationToken
-) {
+): Promise<{ metadata: { command: string } }> {
   const userMesage = request.prompt;
   let systemMsg = prompts.SYSTEM_MESSAGE_WITHOUT_BASE_TEMPLATE;
 
-  let projectLevelStyles = "";
-
-  const projectLevelStylesUri = vscode.Uri.joinPath(
-    vscode.workspace.workspaceFolders![0].uri,
-    "styles/styles.css"
-  );
-
-  try {
-    const projectLevelStylesFile = await vscode.workspace.fs.readFile(
-      projectLevelStylesUri
-    );
-    projectLevelStyles = projectLevelStylesFile.toString();
-  } catch (error) {
-    console.log("project level styles file not found");
-  }
+  let projectLevelStyles = await getProjectLevelStyles();
 
   systemMsg = systemMsg.replace(
     "{project-level-styles}",
-    `styles/styles.css\n${projectLevelStyles}`
+    `${STYLES_PATH}\n${projectLevelStyles}`
   );
 
   const messages = [
-    new vscode.LanguageModelChatSystemMessage(systemMsg),
-    new vscode.LanguageModelChatUserMessage(prompts.SAMPLE_USER_MESSAGE),
-    new vscode.LanguageModelChatAssistantMessage(
+    vscode.LanguageModelChatMessage.User(systemMsg),
+    vscode.LanguageModelChatMessage.User(prompts.SAMPLE_USER_MESSAGE),
+    vscode.LanguageModelChatMessage.Assistant(
       JSON.stringify(prompts.SAMPLE_ASSISTANT_OUTPUT)
     ),
-    new vscode.LanguageModelChatUserMessage(prompts.SAMPLE_USER_MESSAGE_2),
-    new vscode.LanguageModelChatAssistantMessage(
+     vscode.LanguageModelChatMessage.User(prompts.SAMPLE_USER_MESSAGE_2),
+     vscode.LanguageModelChatMessage.Assistant(
       JSON.stringify(prompts.SAMPLE_ASSISTANT_OUTPUT_2)
     ),
-    new vscode.LanguageModelChatUserMessage(userMesage),
+    vscode.LanguageModelChatMessage.User(userMesage),
   ];
 
   const progressStr = vscode.l10n.t("Creating AEM block...");
   stream.progress(progressStr);
-  const chatResponse = await vscode.lm.sendChatRequest(
-    LANGUAGE_MODEL_ID,
-    messages,
-    {},
-    token
-  );
+  const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
+  const chatResponse = await model.sendRequest(messages, {}, token);
 
   let resultJsonStr = "";
-  for await (const fragment of chatResponse.stream) {
+  for await (const fragment of chatResponse.text) {
     resultJsonStr += fragment;
   }
 
@@ -182,17 +142,13 @@ async function createCmdHandlerWithoutTemplate(
       arguments: [JSON.parse(resultJsonStr).files],
     });
   } catch (error) {
-    console.log("Error parsing result json", error);
+    console.error("Error parsing result json", error);
     stream.markdown("Some Network issues. Please try again..");
   }
 
-  
-
-   const resultObj = {
-     metadata: {
-       command: commands.CREATE,
-     },
-   };
-
-   return resultObj;
+  return {
+    metadata: {
+      command: commands.CREATE,
+    },
+  };
 }

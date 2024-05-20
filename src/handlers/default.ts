@@ -1,17 +1,20 @@
 import * as vscode from 'vscode';
 import { AEM_COMMANDS as commands } from '../aem.commands';
-import { LANGUAGE_MODEL_ID } from '../constants';
 import { SYSTEM_MESSAGE } from '../prompts/default';
+
+const MODEL_SELECTOR: vscode.LanguageModelChatSelector = { vendor: 'copilot', family: 'gpt-3.5-turbo' };
+
 
 export async function defaultHandler(request: vscode.ChatRequest, stream: vscode.ChatResponseStream, token: vscode.CancellationToken) {
     const messages = [
-        new vscode.LanguageModelChatSystemMessage(SYSTEM_MESSAGE),
-        new vscode.LanguageModelChatUserMessage(request.prompt)
+        vscode.LanguageModelChatMessage.User(SYSTEM_MESSAGE),
+        vscode.LanguageModelChatMessage.User(request.prompt)
     ];
     const progressStr = vscode.l10n.t("AEM Assistant is thinking ...🤔");
     stream.progress(progressStr);
-    const chatResponse = await vscode.lm.sendChatRequest(LANGUAGE_MODEL_ID, messages, {}, token);
-    for await (const fragment of chatResponse.stream) {
+    const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
+    const chatResponse = await model.sendRequest(messages, {}, token)
+    for await (const fragment of chatResponse.text) {
       stream.markdown(fragment);
     }
 

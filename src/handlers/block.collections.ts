@@ -11,132 +11,77 @@ export async function fetchBlock(
   stream: vscode.ChatResponseStream,
   token: vscode.CancellationToken
 ) {
-  let blockName = request.prompt;
-  blockName = blockName.trim().toLowerCase();
-  const progressStr = vscode.l10n.t(
-    "Fetching Block From Block Collection ...🤔"
-  );
-  stream.progress(progressStr);
-  if (blockName === "ls") {
-   const listblock = vscode.l10n.t(
-     `List of available blocks: \n\n  - ${BLOCK_COLLECTION_LIST.join(
-       "\n - "
-     )}`
-   );
-   stream.markdown(listblock);
+  const blockName = request.prompt.trim().toLowerCase();
+  stream.progress(vscode.l10n.t("Fetching Block From Block Collection ...🤔"));
+
+  if (blockName === "ls" || !BLOCK_COLLECTION_LIST.includes(blockName)) {
+    const message = blockName === "ls" ? 
+      `List of available blocks: \n\n  - ${BLOCK_COLLECTION_LIST.join("\n - ")}` :
+      `Block not found in collection \n here is the list of available blocks: \n\n  - ${BLOCK_COLLECTION_LIST.join("\n - ")}`;
+    stream.markdown(vscode.l10n.t(message));
+    return;
   }
-  else if (!BLOCK_COLLECTION_LIST.includes(blockName)) {
-    const errorMsg = vscode.l10n.t(`Block not found in collection \n here is the list of available blocks: \n\n  - ${BLOCK_COLLECTION_LIST.join("\n - ")}`);
-    stream.markdown(errorMsg);
-  } else {
+
+  try {
     const files = await fetchAEMBlock(blockName, stream);
     stream.button({
       command: PROCESS_COPILOT_CREATE_CMD,
       title: vscode.l10n.t(PROCESS_COPILOT_CREATE_CMD),
       arguments: [files],
     });
+  } catch (error) {
+    stream.markdown(`Error fetching block:`);
   }
-  const resultObj = {
+
+  return {
     metadata: {
       command: commands.COLLECION,
     },
   };
-
-  return resultObj;
 }
 
 async function fetchAEMBlock(
   blockName: string,
   stream: vscode.ChatResponseStream
 ) {
-  let blockJson = [];
-
   const fileTreeMd = `
     ${blockName}
     ├── ${blockName}.js
     └── ${blockName}.css
   `;
 
-  let mdString = `The folder/file structure is as follows:\n
-    ${fileTreeMd}\nFile Content of each files are as follows:\n\n`;
-  
-  stream.markdown(mdString);
-  
+  stream.markdown(`The folder/file structure is as follows:\n${fileTreeMd}\nFile Content of each files are as follows:\n\n`);
+
   const blockJsURL = `${AEM_BLOCK_COLLECTION_URL}/${blockName}/${blockName}.js`;
   const blockCSSURL = `${AEM_BLOCK_COLLECTION_URL}/${blockName}/${blockName}.css`;
-  const response = await fetch(blockJsURL);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${blockJsURL}: ${response.statusText}`);
-  }
-  const javscriptCode = await response.text();
-  stream.markdown(`\`\`\`javascript\n\n${javscriptCode}\n\n\`\`\``);
 
-  const response2 = await fetch(blockCSSURL);
-  if (!response2.ok) {
-    throw new Error(`Failed to fetch ${blockCSSURL}: ${response2.statusText}`);
-  }
-    const cssCode = await response2.text();
-  stream.markdown(`\nBlock Styling CSS: ${blockName}.css \n\n`);
-  stream.markdown(`\`\`\`css\n\n${cssCode}\n\`\`\``);
+  const [javascriptCode, cssCode] = await Promise.all([
+    fetchFile(blockJsURL, 'javascript', stream),
+    fetchFile(blockCSSURL, 'css', stream)
+  ]);
 
-  blockJson.push(
+  return [
     {
       name: `${blockName}.js`,
-      type: javscriptCode,
-      path: "blocks/" + blockName + "/" + blockName + ".js",
-      content: javscriptCode,
+      type: 'javascript',
+      path: `blocks/${blockName}/${blockName}.js`,
+      content: javascriptCode,
     },
     {
       name: `${blockName}.css`,
-      type: cssCode,
-      path: "blocks/" + blockName + "/" + blockName + ".css",
+      type: 'css',
+      path: `blocks/${blockName}/${blockName}.css`,
       content: cssCode,
     }
-  );
-
-  return blockJson;
+  ];
 }
 
-//  prompt: "How to build AEM blocks?",
-//             label: vscode.l10n.t("Build with AEM"),
-//   command: commands.INFO,
-    
-
-// async function getGitHubFolderContents(blockName: string, stream: vscode.ChatResponseStream, path?: string) {
-//     try {
-//         const url = `${AEM_BLOCK_COLLECTION_URL}/${blockName}${ path ? `/${path}` : ''}`;
-//         const response = await fetch(url);
-//         if (!response.ok) {
-//             throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
-//         }
-
-//         const content = await response.json();
-
-//         // Check if the response is a directory
-//         if (Array.isArray(content)) {
-//             for (const item of content) {
-//                 if (item.type === 'file') {
-//                     let file = {}
-//                     const fileContentResponse = await fetch(item.download_url);
-//                     if (!fileContentResponse.ok) {
-//                         throw new Error(`Failed to fetch ${item.download_url}: ${fileContentResponse.statusText}`);
-//                     }
-//                     const fileContent = await fileContentResponse.text();
-//                     // file['name'] = item.name;
-//                     // file['content'] = fileContent;
-//                     // file['type'] = 'file';
-//                     // file['path'] = item.path;
-//                     console.log(`File: ${file}`);
-//                     stream.markdown(`\`\`\`${JSON.stringify(file)}\`\`\``);
-//                 } else if (item.type === 'dir') {
-//                     console.log(`Entering directory: ${item.path}`);
-//                     await getGitHubFolderContents(blockName, stream, item.path);
-//                 }
-//             }
-//         } else {
-//             console.log(`Not a directory: ${url}`);
-//         }
-//     } catch (error) {
-//         console.error('Error:', (error as Error).message);
-//     }
-// }
+async function fetchFile(url: string, language: string, stream: vscode.ChatResponseStream) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+  }
+  const code = await response.text();
+  stream.markdown(`\`\`\`${language}\n\n${code}\n\n\`\`\``);
+  return code;
+}

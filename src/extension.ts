@@ -25,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Define a AEM chat handler.
   const handler: vscode.ChatRequestHandler = async (
     request: vscode.ChatRequest,
-    context2: vscode.ChatContext,
+    chatContext: vscode.ChatContext,
     stream: vscode.ChatResponseStream,
     token: vscode.CancellationToken
   ): Promise<IAemChatResult> => {
