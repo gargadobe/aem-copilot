@@ -21,9 +21,6 @@
   ],
   "activationEvents": [
   ],
-  "enabledApiProposals": [
-    "chatVariableResolver"
-  ],
   "contributes": {
     "chatParticipants": [
       {
