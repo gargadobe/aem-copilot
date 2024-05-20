@@ -140,20 +140,20 @@ export const SAMPLE_ASSISTANT_OUTPUT_2 = {
     },
   ],
   mdtable: `
-  | table    |         |
-  |----------|---------|
-  | Header1  | Header2 |
-  | value1   | value2  |
+  | table    |
+  |----------|
+  | Name     |
+  | John     |
 `,
   inputHtml: `
     <div>
           <div>
-            <div>Header1</div>
-            <div>Header2</div>
+            <div>Name</div>
+            <div>Age</div>
           </div>
           <div>
-            <div>value1</div>
-            <div>value2</div>
+            <div>John</div>
+            <div>25</div>
           </div>
     </div>
       `,
@@ -241,7 +241,7 @@ export const SAMPLE_ASSISTANT_OUTPUT = {
   mdtable: `
   | Tabs    |              |
   |---------|--------------|
-  | Tab One | tab one text | 
+  | Tab1    | tab one text | 
   | Tab Two | tab two text |
 `,
   inputHtml: `

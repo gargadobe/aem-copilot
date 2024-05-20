@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-extension-samples"
   },
-  "version": "0.1.0",
+  "version": "0.0.1",
   "engines": {
     "vscode": "^1.88.0"
   },
@@ -58,8 +58,16 @@
     ],
     "commands": [
       {
-        "command": "cat.namesInEditor",
-        "title": "Use Cat Names in Editor"
+        "command": "create",
+        "title": "Create EDS block"
+      },
+      {
+        "command": "info",
+        "title": "Information About AEM EDS blocks"
+      },
+      {
+        "command": "collection",
+        "title": "Pull a block from aem block collection repo"
       }
     ]
   },
