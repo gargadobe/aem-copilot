@@ -2,24 +2,30 @@ import * as vscode from "vscode";
 import { AEM_COMMANDS as commands } from "../aem.commands";
 import {
   AEM_BLOCK_COLLECTION_URL,
-  BLOCK_COLLECTION_LIST,
   PROCESS_COPILOT_CREATE_CMD,
 } from "../constants";
+import { getBlockContent, getBlocksList, getEDSContent } from "../utils";
 
 export async function fetchBlock(
   request: vscode.ChatRequest,
   stream: vscode.ChatResponseStream,
-  token: vscode.CancellationToken
+  token: vscode.CancellationToken,
+  context: vscode.ExtensionContext
 ) {
   const blockName = request.prompt.trim().toLowerCase();
-  stream.progress(vscode.l10n.t("Fetching Block From Block Collection ...🤔"));
+  stream.progress(vscode.l10n.t("Fetching Blocks From Block Collection ...🤔"));
+  let metadata = {
+    command: commands.COLLECION,
+  }
 
-  if (blockName === "ls" || !BLOCK_COLLECTION_LIST.includes(blockName)) {
-    const message = blockName === "ls" ? 
-      `List of available blocks: \n\n  - ${BLOCK_COLLECTION_LIST.join("\n - ")}` :
-      `Block not found in collection \n here is the list of available blocks: \n\n  - ${BLOCK_COLLECTION_LIST.join("\n - ")}`;
+  let blockList = await getBlocksList(context);
+
+  if (blockName === "ls" || !blockList?.includes(blockName)) {
+    const message = blockName === "ls" ?
+      `List of available blocks: \n\n  - ${blockList?.join("\n - ")}` :
+      `Block not found in collection \n here is the list of available blocks: \n\n  - ${blockList?.join("\n - ")}`;
     stream.markdown(vscode.l10n.t(message));
-    return;
+    return metadata;
   }
 
   try {
@@ -33,55 +39,54 @@ export async function fetchBlock(
     stream.markdown(`Error fetching block:`);
   }
 
-  return {
-    metadata: {
-      command: commands.COLLECION,
-    },
-  };
+  return metadata;
 }
+
+
+function getFiles(children: any[], blockContentJsonNew: any[], stream: vscode.ChatResponseStream) {
+  for (let child of children) {
+    if (child.type === 'file') {
+      blockContentJsonNew.push(child);
+      let language = child.name.endsWith(".js") ? 'javascript' : 'css';
+      stream.markdown(`\`\`\`${language}\n\n${child.content}\n\n\`\`\`\n\n`);
+    } else {
+      getFiles(child.children, blockContentJsonNew, stream);
+    }
+  }
+}
+
+function buildFileTree(element: { type: string, name: string, children?: typeof element[] , path: string}, prefix = ''): string {
+  let fileTreeMd = '';
+  if (element.type === 'file') {
+    fileTreeMd +=  prefix + '├──' + element.name;
+  } else if (element.type === 'folder') {
+    fileTreeMd +=  prefix + element.name;
+    if (element.children) {
+      for (let child of element.children) {
+        fileTreeMd += buildFileTree(child, prefix + '    ');
+      }
+    }
+  }
+  return fileTreeMd;
+}
+
 
 async function fetchAEMBlock(
   blockName: string,
   stream: vscode.ChatResponseStream
 ) {
-  const fileTreeMd = `
-    ${blockName}
-    ├── ${blockName}.js
-    └── ${blockName}.css
-  `;
-
-  stream.markdown(`The folder/file structure is as follows:\n${fileTreeMd}\nFile Content of each files are as follows:\n\n`);
-
-  const blockJsURL = `${AEM_BLOCK_COLLECTION_URL}/${blockName}/${blockName}.js`;
-  const blockCSSURL = `${AEM_BLOCK_COLLECTION_URL}/${blockName}/${blockName}.css`;
-
-  const [javascriptCode, cssCode] = await Promise.all([
-    fetchFile(blockJsURL, 'javascript', stream),
-    fetchFile(blockCSSURL, 'css', stream)
-  ]);
-
-  return [
-    {
-      name: `${blockName}.js`,
-      type: 'javascript',
-      path: `blocks/${blockName}/${blockName}.js`,
-      content: javascriptCode,
-    },
-    {
-      name: `${blockName}.css`,
-      type: 'css',
-      path: `blocks/${blockName}/${blockName}.css`,
-      content: cssCode,
-    }
-  ];
-}
-
-async function fetchFile(url: string, language: string, stream: vscode.ChatResponseStream) {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+  const blockContentJson = await getBlockContent(blockName);
+  let blockContentJsonNew: any[] = [];
+  stream.markdown(`The folder/file structure is as follows:\n`);
+  let fileTreeMd = `
+  ${blockName}
+  `
+  for (let element of blockContentJson.children) {
+    fileTreeMd += buildFileTree(element);
+    fileTreeMd += '\n  ';
   }
-  const code = await response.text();
-  stream.markdown(`\`\`\`${language}\n\n${code}\n\n\`\`\``);
-  return code;
+  stream.markdown(`\`\`\`markdown\n\n${fileTreeMd}\n\n\`\`\`\n\n`);
+  stream.markdown('\n\n');
+  getFiles(blockContentJson.children, blockContentJsonNew, stream);
+  return blockContentJsonNew;
 }

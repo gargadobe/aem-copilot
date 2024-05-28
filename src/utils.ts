@@ -2,6 +2,9 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 
+import { AEM_BLOCK_COLLECTION_URL } from "./constants";
+import { JSDOM } from "jsdom";
+
 export async function createFileWithContent(
   filePath: string,
   content: string
@@ -21,7 +24,7 @@ export async function createFolderAndFiles(files: any[]): Promise<void> {
         cancellable: false,
       },
       async (progress) => {
-        if (files.length > 0) { 
+        if (files.length > 0) {
           // split files[0] by / and if first starts with blocks and second would represent the block name , check if that folder exist then delete that
           const blockName = files[0].path.split("/")[1];
           const blockPath = path.join(baseUri.fsPath, "/blocks/" + blockName);
@@ -163,3 +166,101 @@ function createFileTreeMd(tree: any, depth = 0) {
   }
   return mdString;
 }
+
+
+
+// block collection functions
+
+export async function getBlocksList(context: vscode.ExtensionContext): Promise<string[] | undefined> {
+  let blocks: string[] = [];
+  try {
+    blocks = context.globalState.get("blocks") || [];
+    if (blocks.length == 0) {
+      const { folders } = await getEDSContent("blocks/");
+      blocks = folders;
+      context.globalState.update("blocks", blocks);
+    }
+  } catch (error) {
+    console.error('Error getting blocks list:', error);
+  }
+  return blocks;
+}
+
+export async function getEDSContent(folderName: string): Promise<{ folders: string[], files: string[] }> {
+  const url = `${AEM_BLOCK_COLLECTION_URL}${folderName}`;
+  let folders: string[] = [];
+  let files: string[] = [];
+
+  try {
+    const response = await fetch(url);
+    const html = await response.text(); // Get the raw HTML content
+
+    // Create a temporary DOM element to parse the HTML
+    const dom = new JSDOM(html);
+    const document = dom.window.document;
+
+    document.querySelectorAll('div.listing tr a').forEach(link => {
+      const path = link.getAttribute('href') || '';
+      if (path.startsWith("/gh")) {
+        if (path.endsWith('/')) {
+          const blockName = path.split('/').filter(Boolean).pop();
+          if (blockName) {
+            folders.push(blockName);
+          }
+        } else {
+          const fileName = path.split('/').filter(Boolean).pop();
+          if (fileName) {
+            files.push(fileName);
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+  return { folders, files };
+}
+
+
+export async function getBlockContent(blockName: string) {
+  const parentObj: { type: string; path: string, name: string; children: any[] } = {
+    type: 'folder',
+    path: `blocks/${blockName}`,
+    name: blockName,
+    children: []
+  };
+  await recursiveEDSContent(parentObj, parentObj.path)
+  return parentObj;
+}
+export async function getFileContent(filePath: string) {
+  const url = `${AEM_BLOCK_COLLECTION_URL}${filePath}`;
+  let response = await fetch(url);
+  return response.text();
+}
+
+export async function recursiveEDSContent(parentObj: any, folderPath: string) {
+  let { folders, files } = await getEDSContent(`${folderPath}/`);
+  for (let file of files) {
+    const filePath = parentObj.path + '/'+ file;
+    const fileContent = await getFileContent(filePath);
+    parentObj.children.push({
+      type: 'file',
+      name: file,
+      path: filePath,
+      content: fileContent
+    });
+  }
+
+  for (const folder of folders) {
+    const folderPath = parentObj.path + '/'+ folder;
+    const folderObj = {
+      type: 'folder',
+      name: folder,
+      path: folderPath,
+      children: [],
+    };
+    parentObj.children.push(folderObj);
+    await recursiveEDSContent(folderObj, folderObj.path);
+  }
+}
+

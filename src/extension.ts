@@ -20,8 +20,6 @@ interface IAemChatResult extends vscode.ChatResult {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-
-
   // Define a AEM chat handler.
   const handler: vscode.ChatRequestHandler = async (
     request: vscode.ChatRequest,
@@ -37,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
     } else if (request.command == commands.ENHANCE) {
       cmdResult = await enhanceCmdHandler(request, stream, token);
     } else if (request.command == commands.COLLECION) {
-      cmdResult = await fetchBlock(request, stream, token);
+      cmdResult = await fetchBlock(request, stream, token, context);
     } else {
       cmdResult = await defaultHandler(request, stream, token);
     }
