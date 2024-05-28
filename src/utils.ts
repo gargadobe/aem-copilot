@@ -3,7 +3,8 @@ import * as path from "path";
 import * as fs from "fs";
 
 import { AEM_BLOCK_COLLECTION_URL } from "./constants";
-import { JSDOM } from "jsdom";
+
+import { JSDOM } from 'jsdom';
 
 export async function createFileWithContent(
   filePath: string,

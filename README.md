@@ -11,11 +11,18 @@ AEM developer copilot is github copilot chat extension that leverages git copilo
 
 
 
-![demo](./demo.png)
+![demo](./resources/demo.png)
 
 
 ## References
 
 https://code.visualstudio.com/api/extension-guides/chat
+
+
+> [!IMPORTANT]  
+> In order for this feature to work you need to meet the following requirements:
+> - Use the [Visual Studio Code Insiders](https://code.visualstudio.com/insiders/) release
+> - Use the pre-release version of the [GitHub Copilot Chat](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat) extension
+> - Use pre-release of [AEM EDS Copilot ](https://marketplace.visualstudio.com/items?itemName=neerajgrg93.aem-eds-copilot)
 
 

@@ -8,7 +8,7 @@
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-extension-samples"
   },
-  "version": "0.0.4",
+  "version": "0.0.8",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -24,6 +24,7 @@
     "chatParticipants": [
       {
         "id": "aem",
+        "fullName": "AEM",
         "name": "aem",
         "description": "AEM Assistant to help with blocks developement",
         "isSticky": true,
