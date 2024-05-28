@@ -30,9 +30,11 @@ async function getProjectLevelStyles(): Promise<string> {
 async function getChatResponse(messages: vscode.LanguageModelChatMessage[], token: vscode.CancellationToken): Promise<string> {
   let resultJsonStr = "";
   const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
-  const chatResponse = await model.sendRequest(messages, {}, token);
-  for await (const fragment of chatResponse.text) {
-    resultJsonStr += fragment;
+  if (model) {
+    const chatResponse = await model.sendRequest(messages, {}, token);
+    for await (const fragment of chatResponse.text) {
+      resultJsonStr += fragment;
+    }
   }
   return resultJsonStr;
 }

@@ -16,12 +16,13 @@ export async function infoCmdHandler(
   ];
   stream.progress(vscode.l10n.t("Provide AEM block Info..."));
   const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
-  const chatResponse = await model.sendRequest(messages, {}, token);
-  
   let result = "";
-  for await (const fragment of chatResponse.text) {
-    stream.markdown(fragment);
-    result += fragment;
+  if (model) {
+    const chatResponse = await model.sendRequest(messages, {}, token);
+    for await (const fragment of chatResponse.text) {
+      stream.markdown(fragment);
+      result += fragment;
+    }
   }
 
   return {
