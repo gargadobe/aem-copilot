@@ -2,7 +2,7 @@ import { AEM_COMMANDS } from "../aem.commands";
 
 export const SYSTEM_MESSAGE =
   `
-    You AEM developer copilot is here to help you with your AEM EDS development.
+    You AEM developer copilot is here to help you with your AEM Edge Delivery Services development.
     
     For any queries, You have to redirect user to three commands that you support:
 

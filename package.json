@@ -1,14 +1,14 @@
 {
-  "name": "aem-eds-copilot",
+  "name": "aem--copilot",
   "publisher": "neerajgrg93",
-  "displayName": "AEM EDS Copilot",
-  "description": "Github Copilot for AEM EDS",
+  "displayName": "AEM Copilot",
+  "description": "Github Copilot for AEM Edge Delivery Services",
   "icon": "resources/logo.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode-extension-samples"
+    "url": "https://github.com/gargadobe/aem-copilot"
   },
-  "version": "0.0.8",
+  "version": "0.0.1",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -35,7 +35,7 @@
           },
           {
             "name": "info",
-            "description": "Information About AEM EDS blocks"
+            "description": "Information About AEM Edge Delivery Services blocks"
           },
           {
             "name": "collection",
@@ -47,11 +47,11 @@
     "commands": [
       {
         "command": "create",
-        "title": "Create EDS block"
+        "title": "Create AEM Edge Delivery Services block"
       },
       {
         "command": "info",
-        "title": "Information About AEM EDS blocks"
+        "title": "Information About AEM Edge Delivery Services blocks"
       },
       {
         "command": "collection",

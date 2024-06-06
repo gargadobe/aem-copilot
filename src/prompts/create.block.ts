@@ -1,13 +1,13 @@
-export const USER_MESSAGE = `Create a new AEM EDS block based on the provided requirements.
+export const USER_MESSAGE = `Create a new AEM Edge Delivery Services block based on the provided requirements.
  User Input: #user_input
- Base EDS Block Json string: #base_block
+ Base Edge Delivery Services Block Json string: #base_block
 `;
 
 export const SYSTEM_MESSAGE = `
 ---
-Your task is to generate JSON for a new AEM EDS block, including JavaScript and CSS files, a markdown table representation, and sample input HTML based on the provided requirements.
-You will be given a base EDS block JSON that will be either of the same type or a different type. If it is similar, enhance the block based on user input. If it is different, create a new block based on the user input.
-Output should be in the same format as the given Base EDS block JSON string.
+Your task is to generate JSON for a new AEM Edge Delivery Services block, including JavaScript and CSS files, a markdown table representation, and sample input HTML based on the provided requirements.
+You will be given a base Edge Delivery Services block JSON that will be either of the same type or a different type. If it is similar, enhance the block based on user input. If it is different, create a new block based on the user input.
+Output should be in the same format as the given Base Edge Delivery Services block JSON string.
 ---
 
 Requirements:
@@ -15,9 +15,9 @@ Requirements:
 ---
 1. Extract Block Name: Extract the block name from the user's input.
 
-2. Analyze Base block JSON: Analyze the base EDS block JSON string provided in the user input and use that code to create a new block based on the user's requirements.
+2. Analyze Base block JSON: Analyze the base Edge Delivery Services block JSON string provided in the user input and use that code to create a new block based on the user's requirements.
 
-2. Generate Markdown Table: Create an appropriate markdown table representation based on the block requirement using base EDS block markdown table as a reference.
+2. Generate Markdown Table: Create an appropriate markdown table representation based on the block requirement using base Edge Delivery Services block markdown table as a reference.
    - First row should list the block name only
    - Reflect the block's structure in the markdown table, with each row representing a component or element within the block.
 
@@ -30,7 +30,7 @@ Requirements:
    - Generate the block_name.js and block_name.css files based on the block name extracted from the user input.
    - The block_name.js file should contain a 'decorate' function that takes the Input html from last step and decorates it.
 
-5. Functionality of EDS Block:
+5. Functionality of Edge Delivery Services Block:
    - Ensure the generated block functions fully as per the given input or based on the block name/type.
 
 6. CSS Styling:
@@ -38,7 +38,7 @@ Requirements:
    - Avoid adding any style in the JavaScript file; use the CSS file for styling.
 
 7. JavaScript Functionality:
-   - Start the EDS block JavaScript file with a function called 'decorate'. This function takes the block input, an HTML element, and decorates it. The block element contains the HTML structure of the block, which varies depending on the block type.
+   - Start the Edge Delivery Services block JavaScript file with a function called 'decorate'. This function takes the block input, an HTML element, and decorates it. The block element contains the HTML structure of the block, which varies depending on the block type.
    - The decorate method should add classes or IDs for styling or functionality.
 ---
 
@@ -263,7 +263,7 @@ export const SAMPLE_ASSISTANT_OUTPUT = {
 
 export const SYSTEM_MESSAGE_WITHOUT_BASE_TEMPLATE = `
 ---
-Your task is to generate JSON for a new AEM EDS (Adobe Experience Manager - Edit Design System) block, including JavaScript and CSS files, a markdown table representation, and sample input HTML based on the provided requirements.
+Your task is to generate JSON for a new AEM Edge Delivery Services block, including JavaScript and CSS files, a markdown table representation, and sample input HTML based on the provided requirements.
 ---
 **Requirements:**
 1. **Extract Block Name**: Extract the block name from the user's input.
@@ -277,12 +277,12 @@ Your task is to generate JSON for a new AEM EDS (Adobe Experience Manager - Edit
    - Internal elements(div) must not have any classes, IDs, or other html attributes.
 4. **Create Folder/File Structures**: 
    - Based on the extracted block name and the input HTML structure, generate block_name.js and block_name.css files only
-5. **Functionality of EDS Block**:
+5. **Functionality of Edge Delivery Services Block**:
    - Ensure the generated block has full functionality as per the given input or based on the block name/type.
 6. **CSS Styling**:
    - In the CSS content, add fixed height and width for the block to ensure proper display. Do not add any style in the JavaScript file; use the CSS file for styling.
 7. **JavaScript Functionality**:
-   - An EDS block JavaScript file must start with a function called 'decorate'. This function takes the block input, which is an HTML element, and decorates it. The block element contains the HTML structure of the block, which varies depending on the block type.
+   - An Edge Delivery Services block JavaScript file must start with a function called 'decorate'. This function takes the block input, which is an HTML element, and decorates it. The block element contains the HTML structure of the block, which varies depending on the block type.
    - Decorate method decorates the input html with full fledged functionality as per the block type.
 **Output Format**:
 - Strictly Generate valid JSON only.
