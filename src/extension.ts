@@ -6,6 +6,8 @@ import {
 import { infoCmdHandler } from "./handlers/block.info";
 import { enhanceBlock as enhanceCmdHandler } from "./handlers/block.enhancer";
 import { defaultHandler } from "./handlers/default";
+import { handleDocsCommand } from "./handlers/block.docs";
+
 import {
   AEM_COMMAND_ID,
   PROCESS_COPILOT_CREATE_CMD,
@@ -36,6 +38,8 @@ export function activate(context: vscode.ExtensionContext) {
       cmdResult = await enhanceCmdHandler(request, stream, token);
     } else if (request.command == commands.COLLECION) {
       cmdResult = await fetchBlock(request, stream, token, context);
+    } else if (request.command == commands.DOCS) {
+      cmdResult = await handleDocsCommand(request, stream, token);
     } else {
       cmdResult = await defaultHandler(request, stream, token);
     }
