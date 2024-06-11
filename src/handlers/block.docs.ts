@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { AEM_COMMANDS as commands } from "../aem.commands";
 
-const SYSTEM_MESSAGE = 'You are a customer support agent answering questions based on a set of provided documents by the assistent. ' +
+const SYSTEM_MESSAGE = 'You are a customer support agent specialized in AEM projects. You are answering questions based on a set of provided documents by the assistent. ' +
     'The provided documents are formated in JSON format, with each containing at least a title, a content and a url. ' +
     'Whenever you use content from one of the documents, attribute this with the url of the document. ' +
     'If you are not sure, answer with "I can only answer questions about AEM. "'
@@ -106,7 +106,15 @@ export async function handleDocsCommand(
             }
         }
     } catch (err) {
-        handleError(err, stream);
+        if (err instanceof vscode.LanguageModelError) {
+            console.log(err.message, err.code, err.cause);
+            if (err.cause instanceof Error && err.cause.message.includes('off_topic')) {
+                stream.markdown(vscode.l10n.t('I\'m sorry, I can only explain computer science concepts.'));
+            }
+        } else {
+            // re-throw other errors so they show up in the UI
+            throw err;
+        }
     }
 
     return {
@@ -114,20 +122,4 @@ export async function handleDocsCommand(
             command: commands.DOCS,
         },
     };
-}
-
-function handleError(err: any, stream: vscode.ChatResponseStream): void {
-    // making the chat request might fail because
-    // - model does not exist
-    // - user consent not given
-    // - quote limits exceeded
-    if (err instanceof vscode.LanguageModelError) {
-        console.log(err.message, err.code, err.cause);
-        if (err.cause instanceof Error && err.cause.message.includes('off_topic')) {
-            stream.markdown(vscode.l10n.t('I\'m sorry, I can only explain computer science concepts.'));
-        }
-    } else {
-        // re-throw other errors so they show up in the UI
-        throw err;
-    }
 }

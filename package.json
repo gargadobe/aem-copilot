@@ -40,6 +40,10 @@
           {
             "name": "collection",
             "description": "Pull a block from aem block collection repo"
+          },
+          {
+            "name": "docs",
+            "description": "Information About AEM Edge Delivery Services"
           }
         ]
       }
