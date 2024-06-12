@@ -8,29 +8,29 @@ const SYSTEM_MESSAGE = 'You are a customer support agent specialized in AEM proj
 
 const MODEL_SELECTOR: vscode.LanguageModelChatSelector = { vendor: 'copilot', family: 'gpt-3.5-turbo' };
 
-const INDEX_URL:string = "https://www.aem.live/docpages-index.json";
+const INDEX_URL: string = "https://www.aem.live/docpages-index.json";
 
 let INDEX: any[];
 
-function poorMansNormalize(text : string): string[] {
+function poorMansNormalize(text: string): string[] {
     const s = text.toLowerCase().replace(/[^a-z0-9]/g, ' ');
     // filter common fill words like a, the, etc.
     const words = s.split(' ').filter((word) => word.length > 2).filter((word) => word != 'the' && word != 'and' && word != 'for' && word != 'with' && word != 'from' && word != 'that' && word != 'this' && word != 'which' && word != 'what' && word != 'how' && word != 'why' && word != 'when' && word != 'where' && word != 'who' && word != 'whom' && word != 'whose' && word != 'will' && word != 'would' && word != 'should' && word != 'could' && word != 'can' && word != 'may' && word != 'might' && word != 'shall' && word != 'must' && word != 'have' && word != 'has' && word != 'had' && word != 'do' && word != 'does' && word != 'did' && word != 'is' && word != 'are' && word != 'was' && word != 'were' && word != 'be' && word != 'been' && word != 'being' && word != 'it' && word != 'its' && word != 'they' && word != 'them' && word != 'their' && word != 'our' && word != 'we' && word != 'us' && word != 'you' && word != 'your' && word != 'my' && word != 'mine' && word != 'his' && word != 'her' && word != 'he' && word != 'she' && word != 'it' && word != 'its' && word != 'him' && word != 'her' && word != 'his' && word != 'hers' && word != 'they' && word != 'them' && word != 'their' && word != 'theirs' && word != 'we' && word != 'us' && word != 'our' && word != 'ours' && word != 'you' && word != 'your' && word != 'yours' && word != 'my' && word != 'mine' && word != 'our' && word != 'ours' && word != 'your' && word != 'yours' && word != 'my' && word != 'mine' && word != 'his' && word != 'her' && word != 'he' && word != 'she');
     return words.map((e) => e.trim()).filter((e) => !!e);
 }
 
-async function search(query: string, limit:number = 4):Promise<any[] | null> {
+async function search(query: string, limit: number = 4): Promise<any[] | null> {
     // load INDEX if it is not already loaded
     if (!INDEX) {
         // fetch JSON from INDEX_URL
         const response = await fetch(INDEX_URL);
-        const json:any = await response.json();
+        const json: any = await response.json();
         if (json.error) {
             return null;
         }
         INDEX = json.data;
         INDEX = json.data.map((element: { path: string, title: string, content: string }) => ({
-            url : `https://www.aem.live${element.path}`,
+            url: `https://www.aem.live${element.path}`,
             title: element.title,
             content: element.content,
         }));
@@ -38,7 +38,7 @@ async function search(query: string, limit:number = 4):Promise<any[] | null> {
     // search in index
     const terms = poorMansNormalize(query);
 
-    const hits:any = [];
+    const hits: any = [];
     INDEX.forEach(e => {
         // no need to make copy of the element as this is single threaded
         e.firstMatch = -1;
@@ -87,36 +87,25 @@ export async function handleDocsCommand(
     );
     stream.progress(progressStr);
 
-    try {
-        const hits = await search(request.prompt, 2);
-        if (!hits) {
-            stream.markdown('I could not find an answer to your question. Please try again.');
-        } else {
-            const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
-            if (model) {
-                const prompt = getPrompt(hits, request.prompt);
-                const messages = [];
-                for (const m of prompt) {
-                    messages.push(vscode.LanguageModelChatMessage.User(m.content));
-                }
-                const chatResponse = await model.sendRequest(messages, {}, token);
-                for await (const fragment of chatResponse.text) {
-                    stream.markdown(fragment);
-                }
+
+    const hits = await search(request.prompt, 2);
+    if (!hits) {
+        stream.markdown('I could not find an answer to your question. Please try again.');
+    } else {
+        const [model] = await vscode.lm.selectChatModels(MODEL_SELECTOR);
+        if (model) {
+            const prompt = getPrompt(hits, request.prompt);
+            const messages = [];
+            for (const m of prompt) {
+                messages.push(vscode.LanguageModelChatMessage.User(m.content));
             }
-        }
-    } catch (err) {
-        if (err instanceof vscode.LanguageModelError) {
-            console.log(err.message, err.code, err.cause);
-            if (err.cause instanceof Error && err.cause.message.includes('off_topic')) {
-                stream.markdown(vscode.l10n.t('I\'m sorry, I can only explain computer science concepts.'));
+            const chatResponse = await model.sendRequest(messages, {}, token);
+            for await (const fragment of chatResponse.text) {
+                stream.markdown(fragment);
             }
-        } else {
-            // re-throw other errors so they show up in the UI
-            throw err;
         }
     }
-
+    
     return {
         metadata: {
             command: commands.DOCS,
