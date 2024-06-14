@@ -4,10 +4,6 @@
   "displayName": "AEM Copilot",
   "description": "Github Copilot for AEM Edge Delivery Services",
   "icon": "resources/logo.png",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/adobe/aem-copilot"
-  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.90.0"
