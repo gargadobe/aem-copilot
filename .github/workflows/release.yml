@@ -60,6 +60,8 @@ jobs:
     environment: ${{ (inputs.publishToMarketPlace == 'true') && 'release' || 'pre-release' }}
     runs-on: ubuntu-latest
     needs: packaging-job
+    env:
+      EXTENSION_NAME: aem-github-copilot
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
