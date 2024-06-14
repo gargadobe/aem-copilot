@@ -1,7 +1,7 @@
 {
-  "name": "aem-copilot",
+  "name": "aem-copilot-test",
   "publisher": "neerajgrg93",
-  "displayName": "AEM Copilot",
+  "displayName": "AEM Copilot Test",
   "description": "Github Copilot for AEM Edge Delivery Services",
   "icon": "resources/logo.png",
   "version": "0.0.1",
