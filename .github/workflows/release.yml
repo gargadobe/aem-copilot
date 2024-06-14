@@ -79,4 +79,4 @@ jobs:
     - name: Publish to VS Code Marketplace
       if: ${{ github.event_name == 'schedule' || inputs.publishToMarketPlace == 'true' }}
       run: |
-          vsce publish -p ${{ secrets.VSCODE_MARKETPLACE_TOKEN }} --packagePath aem-copilot-github/${{ env.EXTENSION_NAME }}-${{ env.EXT_VERSION }}-${GITHUB_RUN_NUMBER}.vsix
+          vsce publish -p ${{ secrets.VSCODE_MARKETPLACE_TOKEN }} --packagePath aem-github-copilot/${{ env.EXTENSION_NAME }}-${{ env.EXT_VERSION }}-${GITHUB_RUN_NUMBER}.vsix
